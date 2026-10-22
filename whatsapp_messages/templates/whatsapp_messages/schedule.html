@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{{ title|default:"Schedule WhatsApp Message" }}</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-50 text-slate-900 min-h-screen p-4 md:p-10 flex items-center justify-center">
+
+  <div class="w-full max-w-xl bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-8">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-slate-100 pb-5 mb-6">
+
+      <div>
+        <h1 class="text-xl font-bold text-slate-900">
+          Schedule WhatsApp Message
+        </h1>
+
+        <p class="text-xs text-slate-500 mt-1">
+          Dispatches automatically via Evolution API
+        </p>
+      </div>
+
+      <a href="{% url 'scheduled_messages' %}"
+         class="text-xs text-slate-500 hover:text-slate-800 transition font-medium">
+
+        &larr; List
+
+      </a>
+
+    </div>
+
+
+    <!-- Connection Status Banner -->
+    {% if not is_connected %}
+
+      <div class="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-xl
+                  flex flex-col sm:flex-row sm:items-center
+                  justify-between gap-3">
+
+        <div class="text-sm text-rose-700">
+
+          <span class="font-bold block sm:inline">
+            ⚠️ Disconnected:
+          </span>
+
+          Messages will be saved but won't send until you link your WhatsApp.
+
+        </div>
+
+        <a href="{% url 'whatsapp_messages:connect_whatsapp' %}"
+           class="shrink-0 px-4 py-2 bg-rose-600 text-white text-xs
+                  font-semibold rounded-lg hover:bg-rose-700 transition
+                  text-center shadow-sm">
+
+          Connect Now
+
+        </a>
+
+      </div>
+
+    {% else %}
+
+      <div class="mb-6 p-3 bg-emerald-50 border border-emerald-100
+                  rounded-xl flex items-center justify-between">
+
+        <div class="text-sm text-emerald-700 flex items-center gap-2 font-medium">
+
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+
+          WhatsApp Connected
+
+        </div>
+
+        <a href="{% url 'whatsapp_messages:connect_whatsapp' %}"
+           class="text-xs text-emerald-600 hover:text-emerald-800
+                  font-medium underline-offset-2 hover:underline">
+
+          View QR / Status
+
+        </a>
+
+      </div>
+
+    {% endif %}
+
+
+    <!-- Django Messages -->
+    {% if messages %}
+
+      <div class="mb-5 space-y-2">
+
+        {% for message in messages %}
+
+          {% if "currently disconnected" not in message.message %}
+
+            <div class="p-3 text-sm rounded-lg
+              {% if message.tags == 'error' %}
+                bg-rose-50 text-rose-700 border border-rose-200
+              {% else %}
+                bg-emerald-50 text-emerald-700 border border-emerald-200
+              {% endif %}">
+
+              {{ message }}
+
+            </div>
+
+          {% endif %}
+
+        {% endfor %}
+
+      </div>
+
+    {% endif %}
+
+
+    <!-- Schedule Form -->
+    <form method="post" novalidate class="space-y-4">
+
+      {% csrf_token %}
+
+      {% for field in form %}
+
+        <div>
+
+          <label for="{{ field.id_for_label }}"
+                 class="block text-xs font-semibold uppercase
+                        tracking-wider text-slate-600 mb-1.5">
+
+            {{ field.label }}
+
+          </label>
+
+          {{ field }}
+
+
+          {% if field.help_text %}
+
+            <p class="text-[11px] text-slate-400 mt-1">
+              {{ field.help_text }}
+            </p>
+
+          {% endif %}
+
+
+          {% if field.errors %}
+
+            {% for error in field.errors %}
+
+              <p class="text-xs text-rose-600 mt-1 font-medium">
+                {{ error }}
+              </p>
+
+            {% endfor %}
+
+          {% endif %}
+
+        </div>
+
+      {% endfor %}
+
+
+      <!-- Form Actions -->
+      <div class="pt-4 flex flex-wrap items-center justify-end gap-3
+                  border-t border-slate-100 mt-6">
+
+
+        <!-- ALL SCHEDULED MESSAGES BUTTON -->
+        <a href="{% url 'whatsapp_messages:scheduled_messages' %}"
+           class="inline-flex items-center justify-center gap-2
+                  px-4 py-2 text-sm font-semibold
+                  text-indigo-700
+                  bg-indigo-50
+                  border border-indigo-200
+                  hover:bg-indigo-100
+                  hover:border-indigo-300
+                  rounded-lg
+                  transition">
+
+          📅
+
+          <span>
+            All Scheduled Messages
+          </span>
+
+        </a>
+
+
+        <!-- CANCEL BUTTON -->
+        <a href="{% url 'dashboard1' %}"
+           class="px-4 py-2 text-sm font-medium text-slate-600
+                  hover:bg-slate-100 rounded-lg transition">
+
+          Cancel
+
+        </a>
+
+
+        <!-- SCHEDULE BUTTON -->
+        <button type="submit"
+                class="px-5 py-2 text-sm font-semibold text-white
+                       bg-indigo-600 hover:bg-indigo-700
+                       rounded-lg shadow-sm transition">
+
+          Schedule Message
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+
+  <!-- Form Styling -->
+  <style>
+
+    input[type="text"],
+    input[type="datetime-local"],
+    textarea {
+
+      width: 100%;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 0.5rem;
+
+      padding: 0.55rem 0.85rem;
+
+      font-size: 0.875rem;
+
+      outline: none;
+
+      transition: all 0.15s ease-in-out;
+
+    }
+
+
+    input[type="text"]:focus,
+    input[type="datetime-local"]:focus,
+    textarea:focus {
+
+      border-color: #4f46e5;
+
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+
+    }
+
+
+    textarea {
+
+      min-height: 120px;
+
+      resize: vertical;
+
+    }
+
+
+    /* Mobile */
+    @media (max-width: 640px) {
+
+      .flex-wrap a,
+      .flex-wrap button {
+
+        flex: 1 1 100%;
+
+      }
+
+    }
+
+  </style>
+<a href="{% url 'whatsapp_messages:scheduled_messages' %}"
+   class="inline-flex items-center justify-center gap-2
+          px-4 py-2 text-sm font-semibold
+          text-indigo-700 bg-indigo-50
+          border border-indigo-200
+          hover:bg-indigo-100
+          hover:border-indigo-300
+          rounded-lg transition">
+
+  📅
+  <span>All Scheduled Messages</span>
+
+</a>
+</body>
+</html>
+
+
+

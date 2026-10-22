@@ -1,0 +1,1121 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Schedule WhatsApp Message</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+
+            background: #f3f6f9;
+            color: #1f2937;
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        /* -------------------------------------------------- */
+        /* Header */
+        /* -------------------------------------------------- */
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+            color: #111827;
+            font-size: 30px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        /* -------------------------------------------------- */
+        /* Card */
+        /* -------------------------------------------------- */
+
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, 0.07);
+        }
+
+        /* -------------------------------------------------- */
+        /* Connection status */
+        /* -------------------------------------------------- */
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+            padding: 15px 18px;
+
+            border-radius: 10px;
+        }
+
+        .connection-status.connected {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .connection-status.disconnected {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+        }
+
+        .connection-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .connection-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .connection-dot.connected {
+            background: #16a34a;
+        }
+
+        .connection-dot.disconnected {
+            background: #d97706;
+        }
+
+        .connection-title {
+            margin: 0 0 3px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .connection-description {
+            margin: 0;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .connection-link {
+            color: #15803d;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .connection-link:hover {
+            text-decoration: underline;
+        }
+
+        /* -------------------------------------------------- */
+        /* Form */
+        /* -------------------------------------------------- */
+
+        .form-group {
+            margin-bottom: 23px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+
+            color: #111827;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        .form-control {
+            display: block;
+
+            width: 100%;
+
+            padding: 12px 14px;
+
+            border: 1px solid #d1d5db;
+            border-radius: 9px;
+
+            background: #ffffff;
+            color: #111827;
+
+            font-family: inherit;
+            font-size: 15px;
+
+            outline: none;
+
+            transition:
+                border-color 0.15s ease,
+                box-shadow 0.15s ease;
+        }
+
+        .form-control:focus {
+            border-color: #16a34a;
+
+            box-shadow:
+                0 0 0 3px rgba(22, 163, 74, 0.12);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        input[type="datetime-local"].form-control {
+            cursor: pointer;
+        }
+
+        .help-text {
+            margin: 7px 0 0;
+
+            color: #6b7280;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .error-list {
+            margin: 7px 0 0;
+            padding: 0;
+
+            list-style: none;
+
+            color: #dc2626;
+            font-size: 13px;
+        }
+
+        .field-error {
+            border-color: #dc2626 !important;
+        }
+
+        /* -------------------------------------------------- */
+        /* Character count */
+        /* -------------------------------------------------- */
+
+        .message-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-top: 7px;
+        }
+
+        .character-count {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        /* -------------------------------------------------- */
+        /* Buttons */
+        /* -------------------------------------------------- */
+
+        .actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            gap: 12px;
+
+            margin-top: 30px;
+            padding-top: 22px;
+
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            min-height: 44px;
+
+            padding: 10px 20px;
+
+            border: none;
+            border-radius: 9px;
+
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+
+            text-decoration: none;
+
+            cursor: pointer;
+
+            transition:
+                background 0.15s ease,
+                transform 0.15s ease,
+                opacity 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: #16a34a;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #15803d;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        /* -------------------------------------------------- */
+        /* Alerts */
+        /* -------------------------------------------------- */
+
+        .alert {
+            padding: 14px 16px;
+            margin-bottom: 20px;
+
+            border-radius: 10px;
+
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        /* -------------------------------------------------- */
+        /* Message preview */
+        /* -------------------------------------------------- */
+
+        .preview {
+            margin-top: 25px;
+            padding: 18px;
+
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+        }
+
+        .preview-title {
+            margin: 0 0 10px;
+
+            color: #374151;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .preview-message {
+            margin: 0;
+
+            color: #4b5563;
+
+            font-size: 14px;
+            line-height: 1.6;
+
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* -------------------------------------------------- */
+        /* Loading */
+        /* -------------------------------------------------- */
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+
+            margin-right: 8px;
+
+            border: 2px solid rgba(255, 255, 255, 0.45);
+            border-top-color: #ffffff;
+
+            border-radius: 50%;
+
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* -------------------------------------------------- */
+        /* Mobile */
+        /* -------------------------------------------------- */
+
+        @media (max-width: 600px) {
+
+            .page {
+                padding: 25px 12px;
+            }
+
+            .card {
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .header h1 {
+                font-size: 25px;
+            }
+
+            .connection-status {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="container">
+
+        <!-- ================================================= -->
+        <!-- HEADER -->
+        <!-- ================================================= -->
+
+        <div class="header">
+
+            <h1>
+                Schedule WhatsApp Message
+            </h1>
+
+            <p>
+                Choose a WhatsApp number, write your message,
+                and select when it should be sent.
+            </p>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- DJANGO MESSAGES -->
+        <!-- ================================================= -->
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div
+                    class="
+                        alert
+                        {% if message.tags == 'success' %}
+                            alert-success
+                        {% elif message.tags == 'error' %}
+                            alert-error
+                        {% else %}
+                            alert-warning
+                        {% endif %}
+                    "
+                >
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <!-- ================================================= -->
+        <!-- CONNECTION STATUS -->
+        <!-- ================================================= -->
+
+        <div
+            class="
+                connection-status
+                {% if is_connected %}
+                    connected
+                {% else %}
+                    disconnected
+                {% endif %}
+            "
+        >
+
+            <div class="connection-left">
+
+                <span
+                    class="
+                        connection-dot
+                        {% if is_connected %}
+                            connected
+                        {% else %}
+                            disconnected
+                        {% endif %}
+                    "
+                ></span>
+
+                <div>
+
+                    <p class="connection-title">
+
+                        {% if is_connected %}
+                            WhatsApp Connected
+                        {% else %}
+                            WhatsApp Disconnected
+                        {% endif %}
+
+                    </p>
+
+                    <p class="connection-description">
+
+                        {% if is_connected %}
+
+                            Your WhatsApp account is connected
+                            and ready.
+
+                        {% else %}
+
+                            You can schedule the message, but
+                            WhatsApp must be connected when the
+                            scheduled task runs.
+
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <a
+                href="{% url 'whatsapp_messages:connect_whatsapp' %}"
+                class="connection-link"
+            >
+                {% if is_connected %}
+                    Connection Settings
+                {% else %}
+                    Connect WhatsApp
+                {% endif %}
+            </a>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- FORM CARD -->
+        <!-- ================================================= -->
+
+        <div class="card">
+
+            <form
+                method="post"
+                id="scheduleForm"
+                novalidate
+            >
+
+                {% csrf_token %}
+
+
+                <!-- ========================================= -->
+                <!-- PHONE NUMBER -->
+                <!-- ========================================= -->
+
+                <div class="form-group">
+
+                    <label
+                        for="{{ form.phone_number.id_for_label }}"
+                        class="form-label"
+                    >
+                        WhatsApp Number
+                        <span class="required">*</span>
+                    </label>
+
+
+                    <input
+                        type="text"
+                        name="{{ form.phone_number.html_name }}"
+                        id="{{ form.phone_number.id_for_label }}"
+                        value="{{ form.phone_number.value|default:'' }}"
+                        class="
+                            form-control
+                            {% if form.phone_number.errors %}
+                                field-error
+                            {% endif %}
+                        "
+                        placeholder="919876543210"
+                        autocomplete="tel"
+                        inputmode="numeric"
+                        required
+                    >
+
+
+                    {% if form.phone_number.errors %}
+
+                        <ul class="error-list">
+
+                            {% for error in form.phone_number.errors %}
+
+                                <li>
+                                    {{ error }}
+                                </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                    {% else %}
+
+                        <p class="help-text">
+                            Enter the country code followed by the
+                            phone number. Example:
+                            <strong>919876543210</strong>
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ========================================= -->
+                <!-- MESSAGE -->
+                <!-- ========================================= -->
+
+                <div class="form-group">
+
+                    <label
+                        for="{{ form.message.id_for_label }}"
+                        class="form-label"
+                    >
+                        Message
+                        <span class="required">*</span>
+                    </label>
+
+
+                    <textarea
+                        name="{{ form.message.html_name }}"
+                        id="{{ form.message.id_for_label }}"
+                        class="
+                            form-control
+                            {% if form.message.errors %}
+                                field-error
+                            {% endif %}
+                        "
+                        placeholder="Type your WhatsApp message..."
+                        rows="6"
+                        maxlength="10000"
+                        required
+                    >{{ form.message.value|default:'' }}</textarea>
+
+
+                    <div class="message-footer">
+
+                        <div>
+
+                            {% if form.message.errors %}
+
+                                <ul class="error-list">
+
+                                    {% for error in form.message.errors %}
+
+                                        <li>
+                                            {{ error }}
+                                        </li>
+
+                                    {% endfor %}
+
+                                </ul>
+
+                            {% else %}
+
+                                <p class="help-text">
+                                    Enter the message you want to
+                                    send at the scheduled time.
+                                </p>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <span
+                            id="characterCount"
+                            class="character-count"
+                        >
+                            0 characters
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ========================================= -->
+                <!-- SCHEDULE DATE/TIME -->
+                <!-- ========================================= -->
+
+                <div class="form-group">
+
+                    <label
+                        for="{{ form.scheduled_at.id_for_label }}"
+                        class="form-label"
+                    >
+                        Schedule Date &amp; Time
+                        <span class="required">*</span>
+                    </label>
+
+
+                    <input
+                        type="datetime-local"
+                        name="{{ form.scheduled_at.html_name }}"
+                        id="{{ form.scheduled_at.id_for_label }}"
+                        value="{{ form.scheduled_at.value|default:'' }}"
+                        class="
+                            form-control
+                            {% if form.scheduled_at.errors %}
+                                field-error
+                            {% endif %}
+                        "
+                        required
+                    >
+
+
+                    {% if form.scheduled_at.errors %}
+
+                        <ul class="error-list">
+
+                            {% for error in form.scheduled_at.errors %}
+
+                                <li>
+                                    {{ error }}
+                                </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                    {% else %}
+
+                        <p class="help-text">
+                            Select a future date and time. The
+                            message will be handed to Celery for
+                            delivery at this time.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ========================================= -->
+                <!-- PREVIEW -->
+                <!-- ========================================= -->
+
+                <div class="preview">
+
+                    <p class="preview-title">
+                        Message Preview
+                    </p>
+
+                    <p
+                        id="previewMessage"
+                        class="preview-message"
+                    >
+                        Your message preview will appear here.
+                    </p>
+
+                </div>
+
+
+                <!-- ========================================= -->
+                <!-- BUTTONS -->
+                <!-- ========================================= -->
+
+                <div class="actions">
+
+                    <a
+                        href="{% url 'whatsapp_messages:scheduled_messages' %}"
+                        class="btn btn-secondary"
+                    >
+                        Cancel
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        id="submitButton"
+                        class="btn btn-primary"
+                    >
+                        <span
+                            id="submitSpinner"
+                            class="spinner hidden"
+                        ></span>
+
+                        <span id="submitText">
+                            Schedule Message
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+     * =========================================================
+     * Elements
+     * =========================================================
+     */
+
+    const phoneInput =
+        document.getElementById(
+            "{{ form.phone_number.id_for_label }}"
+        );
+
+    const messageInput =
+        document.getElementById(
+            "{{ form.message.id_for_label }}"
+        );
+
+    const scheduledAtInput =
+        document.getElementById(
+            "{{ form.scheduled_at.id_for_label }}"
+        );
+
+    const scheduleForm =
+        document.getElementById(
+            "scheduleForm"
+        );
+
+    const characterCount =
+        document.getElementById(
+            "characterCount"
+        );
+
+    const previewMessage =
+        document.getElementById(
+            "previewMessage"
+        );
+
+    const submitButton =
+        document.getElementById(
+            "submitButton"
+        );
+
+    const submitSpinner =
+        document.getElementById(
+            "submitSpinner"
+        );
+
+    const submitText =
+        document.getElementById(
+            "submitText"
+        );
+
+
+    /*
+     * =========================================================
+     * Set minimum datetime
+     * =========================================================
+     */
+
+    function setMinimumDateTime() {
+
+        if (!scheduledAtInput) {
+            return;
+        }
+
+        const now = new Date();
+
+        /*
+         * datetime-local expects:
+         *
+         * YYYY-MM-DDTHH:MM
+         */
+
+        const year =
+            now.getFullYear();
+
+        const month =
+            String(
+                now.getMonth() + 1
+            ).padStart(2, "0");
+
+        const day =
+            String(
+                now.getDate()
+            ).padStart(2, "0");
+
+        const hours =
+            String(
+                now.getHours()
+            ).padStart(2, "0");
+
+        const minutes =
+            String(
+                now.getMinutes()
+            ).padStart(2, "0");
+
+
+        scheduledAtInput.min =
+            `${year}-${month}-${day}T${hours}:${minutes}`;
+
+    }
+
+
+    /*
+     * =========================================================
+     * Character counter
+     * =========================================================
+     */
+
+    function updateCharacterCount() {
+
+        if (!messageInput || !characterCount) {
+            return;
+        }
+
+        const length =
+            messageInput.value.length;
+
+        characterCount.textContent =
+            `${length} character${length === 1 ? "" : "s"}`;
+
+    }
+
+
+    /*
+     * =========================================================
+     * Message preview
+     * =========================================================
+     */
+
+    function updatePreview() {
+
+        if (!messageInput || !previewMessage) {
+            return;
+        }
+
+        const text =
+            messageInput.value.trim();
+
+        if (text) {
+
+            previewMessage.textContent =
+                text;
+
+        } else {
+
+            previewMessage.textContent =
+                "Your message preview will appear here.";
+
+        }
+
+    }
+
+
+    /*
+     * =========================================================
+     * Phone number formatting
+     * =========================================================
+     */
+
+    if (phoneInput) {
+
+        phoneInput.addEventListener(
+            "input",
+            function () {
+
+                /*
+                 * Keep digits only.
+                 *
+                 * This matches the clean-up performed
+                 * by the Django form.
+                 */
+
+                this.value =
+                    this.value.replace(
+                        /\D/g,
+                        ""
+                    );
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =========================================================
+     * Message events
+     * =========================================================
+     */
+
+    if (messageInput) {
+
+        messageInput.addEventListener(
+            "input",
+            function () {
+
+                updateCharacterCount();
+                updatePreview();
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =========================================================
+     * Form submit
+     * =========================================================
+     */
+
+    if (scheduleForm) {
+
+        scheduleForm.addEventListener(
+            "submit",
+            function (event) {
+
+                /*
+                 * Basic browser-side validation.
+                 * Django performs the real validation.
+                 */
+
+                if (
+                    !phoneInput.value.trim()
+                    ||
+                    !messageInput.value.trim()
+                    ||
+                    !scheduledAtInput.value
+                ) {
+
+                    return;
+                }
+
+
+                /*
+                 * Prevent accidental double submission.
+                 */
+
+                submitButton.disabled = true;
+
+                submitSpinner.classList.remove(
+                    "hidden"
+                );
+
+                submitText.textContent =
+                    "Scheduling...";
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =========================================================
+     * Initial page setup
+     * =========================================================
+     */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            setMinimumDateTime();
+
+            updateCharacterCount();
+
+            updatePreview();
+
+        }
+    );
+
+</script>
+
+</body>
+</html>

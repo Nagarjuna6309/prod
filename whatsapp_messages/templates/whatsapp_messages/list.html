@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>list</title>
+</head>
+<body>
+    {% extends 'base.html' %}
+
+{% block title %}WhatsApp Message Log - Noti5me{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="fw-bold mb-0">Scheduled WhatsApp Queue</h4>
+    <p class="text-muted small mb-0">Real-time status of outgoing user-to-user notifications</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'whatsapp_messages:connect' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-qr-code me-1"></i> Device Pairing
+    </a>
+    <a href="{% url 'whatsapp_messages:schedule' %}" class="btn btn-success btn-sm">
+      <i class="bi bi-plus-lg me-1"></i> Schedule Message
+    </a>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light border-bottom">
+          <tr class="small text-secondary">
+            <th class="ps-3 py-3">Recipient</th>
+            <th>Message Snippet</th>
+            <th>Scheduled For</th>
+            <th>Status</th>
+            <th class="pe-3 text-end">Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for msg in messages %}
+            <tr>
+              <!-- Recipient Info -->
+              <td class="ps-3">
+                <div class="fw-semibold text-dark">
+                  {% if msg.recipient_user %}
+                    <i class="bi bi-person-fill text-muted me-1"></i>{{ msg.recipient_user.username }}
+                  {% else %}
+                    <i class="bi bi-telephone-fill text-muted me-1"></i>{{ msg.recipient_number }}
+                  {% endif %}
+                </div>
+                <div class="text-muted" style="font-size: 0.75rem;">{{ msg.recipient_number }}</div>
+              </td>
+
+              <!-- Message Preview -->
+              <td>
+                <span class="text-dark small" title="{{ msg.message_body }}">
+                  {{ msg.message_body|truncatechars:45 }}
+                </span>
+              </td>
+
+              <!-- Dispatch Time -->
+              <td class="small text-secondary">
+                <i class="bi bi-calendar3 me-1"></i>{{ msg.scheduled_time|date:"M d, Y H:i" }}
+              </td>
+
+              <!-- Status Pill -->
+              <td>
+                {% if msg.status == 'SENT' %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">
+                    <i class="bi bi-check2 me-1"></i>Delivered
+                  </span>
+                {% elif msg.status == 'PENDING' %}
+                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                    <i class="bi bi-hourglass-split me-1"></i>Pending
+                  </span>
+                {% elif msg.status == 'PROCESSING' %}
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    <i class="bi bi-arrow-repeat me-1"></i>Dispatching
+                  </span>
+                {% else %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle" 
+                        data-bs-toggle="tooltip" 
+                        data-bs-placement="top" 
+                        title="{{ msg.error_message|default:'Unknown error occurred' }}">
+                    <i class="bi bi-exclamation-circle me-1"></i>Failed
+                  </span>
+                {% endif %}
+              </td>
+
+              <!-- Error details / actions -->
+              <td class="pe-3 text-end">
+                {% if msg.error_message %}
+                  <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size: 0.75rem;" 
+                          data-bs-toggle="modal" data-bs-target="#errorModal{{ msg.id }}">
+                    Logs
+                  </button>
+
+                  <!-- Modal for Error Log -->
+                  <div class="modal fade" id="errorModal{{ msg.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered text-start">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h6 class="modal-title text-danger fw-bold"><i class="bi bi-bug me-1"></i>Dispatch Failure Log</h6>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                          <pre class="bg-light p-3 rounded small text-wrap text-break mb-0">{{ msg.error_message }}</pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                  <span class="text-muted" style="font-size: 0.75rem;">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center py-5 text-muted">
+                <i class="bi bi-chat-left-dots text-secondary" style="font-size: 2.5rem;"></i>
+                <p class="mt-2 mb-3">No WhatsApp messages scheduled yet.</p>
+                <a href="{% url 'whatsapp_messages:schedule' %}" class="btn btn-sm btn-success">
+                  Schedule Your First Message
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Initialize Bootstrap tooltips for failure reasons
+  document.addEventListener('DOMContentLoaded', () => {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map((el) => new bootstrap.Tooltip(el));
+  });
+</script>
+{% endblock %}
+</body>
+</html>

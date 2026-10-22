@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule WhatsApp Message</title>
+</head>
+<body>
+    <h2>Schedule WhatsApp Message to Another User</h2>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li style="color: green;">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 10px;">
+            <label for="recipient_id">Select Recipient User:</label><br>
+            <select name="recipient_id" id="recipient_id" required>
+                <option value="" disabled selected>-- Choose a user --</option>
+                {% for u in available_users %}
+                    <option value="{{ u.id }}">{{ u.username }} ({{ u.email }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label for="recipient_phone">Recipient WhatsApp Number:</label><br>
+            <input type="text" name="recipient_phone" placeholder="e.g. +919876543210" required>
+            <br><small>Include country code, e.g., +91 for India.</small>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label for="body">Message Content:</label><br>
+            <textarea name="body" rows="4" required></textarea>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label for="scheduled_time">Schedule Delivery Time:</label><br>
+            <input type="datetime-local" name="scheduled_time" required>
+        </div>
+
+        <button type="submit">Schedule Message</button>
+    </form>
+</body>
+</html>

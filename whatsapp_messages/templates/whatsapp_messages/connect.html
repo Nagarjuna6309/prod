@@ -1,0 +1,1019 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Connect WhatsApp</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+
+            background: #f3f6f9;
+            color: #1f2937;
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+            color: #111827;
+        }
+
+        .header p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, 0.07);
+        }
+
+        /* -------------------------------------------------- */
+        /* Status */
+        /* -------------------------------------------------- */
+
+        .status-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status-icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+            font-size: 22px;
+        }
+
+        .status-icon.connected {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-icon.disconnected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-icon.loading {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-title {
+            margin: 0 0 4px;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .status-text {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 7px 12px;
+            border-radius: 999px;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .badge.connected {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge.disconnected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge.loading {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* -------------------------------------------------- */
+        /* QR */
+        /* -------------------------------------------------- */
+
+        .qr-section {
+            text-align: center;
+        }
+
+        .qr-section h2 {
+            margin: 0 0 10px;
+            font-size: 22px;
+            color: #111827;
+        }
+
+        .qr-section > p {
+            margin: 0 auto 25px;
+            max-width: 600px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .qr-wrapper {
+            width: 300px;
+            min-height: 300px;
+
+            margin: 0 auto 25px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 15px;
+
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .qr-image {
+            display: block;
+            width: 270px;
+            height: 270px;
+            object-fit: contain;
+        }
+
+        .no-qr {
+            padding: 40px 20px;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .no-qr-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        /* -------------------------------------------------- */
+        /* Instructions */
+        /* -------------------------------------------------- */
+
+        .instructions {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            margin: 0 0 15px;
+            font-size: 17px;
+        }
+
+        .instructions ol {
+            margin: 0;
+            padding-left: 22px;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        /* -------------------------------------------------- */
+        /* Pairing code */
+        /* -------------------------------------------------- */
+
+        .pairing-code {
+            margin: 20px auto;
+            max-width: 400px;
+
+            padding: 15px;
+
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+        }
+
+        .pairing-code-label {
+            display: block;
+            margin-bottom: 7px;
+
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .pairing-code-value {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #111827;
+        }
+
+        /* -------------------------------------------------- */
+        /* Error */
+        /* -------------------------------------------------- */
+
+        .alert {
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        /* -------------------------------------------------- */
+        /* Buttons */
+        /* -------------------------------------------------- */
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-height: 44px;
+            padding: 10px 18px;
+
+            border: none;
+            border-radius: 9px;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            text-decoration: none;
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                opacity 0.15s ease,
+                background 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #15803d;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        /* -------------------------------------------------- */
+        /* Loading */
+        /* -------------------------------------------------- */
+
+        .spinner {
+            width: 35px;
+            height: 35px;
+
+            border: 4px solid #e5e7eb;
+            border-top-color: #16a34a;
+
+            border-radius: 50%;
+
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* -------------------------------------------------- */
+        /* Mobile */
+        /* -------------------------------------------------- */
+
+        @media (max-width: 600px) {
+
+            .page {
+                padding: 25px 12px;
+            }
+
+            .card {
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .header h1 {
+                font-size: 25px;
+            }
+
+            .status-card {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .qr-wrapper {
+                width: 260px;
+                min-height: 260px;
+            }
+
+            .qr-image {
+                width: 230px;
+                height: 230px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="container">
+
+        <!-- ================================================= -->
+        <!-- HEADER -->
+        <!-- ================================================= -->
+
+        <div class="header">
+            <h1>Connect WhatsApp</h1>
+
+            <p>
+                Connect your WhatsApp account to send scheduled
+                messages through Evolution API.
+            </p>
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- ERROR MESSAGE -->
+        <!-- ================================================= -->
+
+        {% if error_message %}
+
+            <div class="alert alert-error">
+                <strong>Connection error:</strong>
+                {{ error_message }}
+            </div>
+
+        {% endif %}
+
+
+        <!-- ================================================= -->
+        <!-- CONNECTION STATUS -->
+        <!-- ================================================= -->
+
+        <div class="card status-card">
+
+            <div class="status-left">
+
+                <div
+                    id="statusIcon"
+                    class="
+                        status-icon
+                        {% if is_connected %}
+                            connected
+                        {% else %}
+                            disconnected
+                        {% endif %}
+                    "
+                >
+                    {% if is_connected %}
+                        ✓
+                    {% else %}
+                        !
+                    {% endif %}
+                </div>
+
+                <div>
+
+                    <h2
+                        id="statusTitle"
+                        class="status-title"
+                    >
+                        {% if is_connected %}
+                            WhatsApp Connected
+                        {% else %}
+                            WhatsApp Not Connected
+                        {% endif %}
+                    </h2>
+
+                    <p
+                        id="statusText"
+                        class="status-text"
+                    >
+                        {% if is_connected %}
+                            Your WhatsApp account is connected
+                            and ready to send messages.
+                        {% else %}
+                            Scan the QR code below to connect
+                            your WhatsApp account.
+                        {% endif %}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <span
+                    id="statusBadge"
+                    class="
+                        badge
+                        {% if is_connected %}
+                            connected
+                        {% else %}
+                            disconnected
+                        {% endif %}
+                    "
+                >
+
+                    <span class="dot"></span>
+
+                    <span id="statusBadgeText">
+
+                        {% if is_connected %}
+                            Connected
+                        {% else %}
+                            Disconnected
+                        {% endif %}
+
+                    </span>
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- CONNECTED STATE -->
+        <!-- ================================================= -->
+
+        <div
+            id="connectedSection"
+            class="card qr-section {% if not is_connected %}hidden{% endif %}"
+        >
+
+            <h2>WhatsApp is connected</h2>
+
+            <p>
+                Your WhatsApp account is ready. You can now
+                schedule and send WhatsApp messages.
+            </p>
+
+            <div class="actions">
+
+                <a
+                    href="{% url 'whatsapp_messages:schedule_message' %}"
+                    class="btn btn-primary"
+                >
+                    Schedule a Message
+                </a>
+
+                <a
+                    href="{% url 'whatsapp_messages:scheduled_messages' %}"
+                    class="btn btn-secondary"
+                >
+                    View Scheduled Messages
+                </a>
+                 <a
+    href="{% url 'dashboard' %}"
+    class="btn"
+    style="background-color: #e83e8c; color: white; border: none;"
+>
+    Dashboard
+</a>
+
+            </div>
+
+
+            <div class="actions">
+
+                <form
+                    method="post"
+                    action="{% url 'whatsapp_messages:disconnect_whatsapp' %}"
+                    onsubmit="return confirm(
+                        'Are you sure you want to disconnect WhatsApp?'
+                    );"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger"
+                    >
+                        Disconnect WhatsApp
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- QR SECTION -->
+        <!-- ================================================= -->
+
+        <div
+            id="qrSection"
+            class="card qr-section {% if is_connected %}hidden{% endif %}"
+        >
+
+            <h2>Scan QR Code</h2>
+
+            <p>
+                Open WhatsApp on your phone and scan this QR code
+                to connect your account.
+            </p>
+
+
+            <!-- QR IMAGE -->
+
+            <div class="qr-wrapper">
+
+                {% if qr_data.qrcode or qr_data.base64 %}
+
+                    <img
+                        id="qrImage"
+                        class="qr-image"
+                        src="{{ qr_data.qrcode|default:qr_data.base64 }}"
+                        alt="WhatsApp QR Code"
+                    >
+
+                {% else %}
+
+                    <div
+                        id="qrLoading"
+                        class="no-qr"
+                    >
+
+                        <div class="spinner"></div>
+
+                        <p>
+                            Waiting for QR code...
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- PAIRING CODE -->
+            <!-- ================================================= -->
+
+            {% if qr_data.pairingCode %}
+
+                <div class="pairing-code">
+
+                    <span class="pairing-code-label">
+                        Pairing Code
+                    </span>
+
+                    <span class="pairing-code-value">
+                        {{ qr_data.pairingCode }}
+                    </span>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- ================================================= -->
+            <!-- INSTRUCTIONS -->
+            <!-- ================================================= -->
+
+            <div class="instructions">
+
+                <h3>
+                    How to connect
+                </h3>
+
+                <ol>
+
+                    <li>
+                        Open WhatsApp on your phone.
+                    </li>
+
+                    <li>
+                        Open
+                        <strong>Settings</strong>
+                        or
+                        <strong>Menu</strong>.
+                    </li>
+
+                    <li>
+                        Select
+                        <strong>Linked Devices</strong>.
+                    </li>
+
+                    <li>
+                        Select
+                        <strong>Link a Device</strong>.
+                    </li>
+
+                    <li>
+                        Scan the QR code displayed above.
+                    </li>
+
+                </ol>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- REFRESH -->
+            <!-- ================================================= -->
+
+            <div class="actions">
+
+                <button
+                    type="button"
+                    id="refreshButton"
+                    class="btn btn-secondary"
+                    onclick="refreshPage()"
+                >
+                    Refresh QR Code
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- AUTO STATUS MESSAGE -->
+        <!-- ================================================= -->
+
+        <div
+            id="pollingMessage"
+            class="
+                alert
+                alert-warning
+                {% if is_connected %}
+                    hidden
+                {% endif %}
+            "
+        >
+            Waiting for WhatsApp connection...
+            This page checks the connection automatically.
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+     * =========================================================
+     * WhatsApp connection polling
+     * =========================================================
+     *
+     * The page checks the Django status endpoint every 3 seconds.
+     *
+     * When Evolution API reports "open", the page reloads so the
+     * connected interface is displayed.
+     */
+
+    const STATUS_URL =
+        "{% url 'whatsapp_messages:whatsapp_status' %}";
+
+    let pollingTimer = null;
+
+
+    async function checkWhatsAppStatus() {
+
+        try {
+
+            const response = await fetch(
+                STATUS_URL,
+                {
+                    method: "GET",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Accept": "application/json"
+                    },
+                    cache: "no-store"
+                }
+            );
+
+
+            if (!response.ok) {
+                return;
+            }
+
+
+            const data = await response.json();
+
+
+            if (data.connected === true) {
+
+                stopPolling();
+
+                /*
+                 * Reload the page so Django gets the connected
+                 * state and removes the QR code.
+                 */
+
+                window.location.reload();
+
+                return;
+            }
+
+
+            updateDisconnectedStatus(
+                data.state || "disconnected"
+            );
+
+        } catch (error) {
+
+            console.warn(
+                "WhatsApp status check failed:",
+                error
+            );
+
+        }
+
+    }
+
+
+    function updateDisconnectedStatus(state) {
+
+        const statusIcon =
+            document.getElementById("statusIcon");
+
+        const statusTitle =
+            document.getElementById("statusTitle");
+
+        const statusText =
+            document.getElementById("statusText");
+
+        const statusBadge =
+            document.getElementById("statusBadge");
+
+        const statusBadgeText =
+            document.getElementById("statusBadgeText");
+
+
+        if (!statusIcon) {
+            return;
+        }
+
+
+        statusIcon.classList.remove(
+            "connected",
+            "loading"
+        );
+
+        statusIcon.classList.add(
+            "disconnected"
+        );
+
+        statusIcon.textContent = "!";
+
+
+        if (statusTitle) {
+
+            statusTitle.textContent =
+                "WhatsApp Not Connected";
+
+        }
+
+
+        if (statusText) {
+
+            statusText.textContent =
+                "Scan the QR code to connect your WhatsApp account.";
+
+        }
+
+
+        if (statusBadge) {
+
+            statusBadge.classList.remove(
+                "connected",
+                "loading"
+            );
+
+            statusBadge.classList.add(
+                "disconnected"
+            );
+
+        }
+
+
+        if (statusBadgeText) {
+
+            statusBadgeText.textContent =
+                "Disconnected";
+
+        }
+
+    }
+
+
+    function startPolling() {
+
+        if (pollingTimer) {
+            return;
+        }
+
+
+        /*
+         * Check immediately.
+         */
+
+        checkWhatsAppStatus();
+
+
+        /*
+         * Then check every 3 seconds.
+         */
+
+        pollingTimer = setInterval(
+            checkWhatsAppStatus,
+            3000
+        );
+
+    }
+
+
+    function stopPolling() {
+
+        if (pollingTimer) {
+
+            clearInterval(
+                pollingTimer
+            );
+
+            pollingTimer = null;
+
+        }
+
+    }
+
+
+    function refreshPage() {
+
+        window.location.reload();
+
+    }
+
+
+    /*
+     * Start polling only when the account is not connected.
+     */
+
+    {% if not is_connected %}
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                startPolling();
+
+            }
+        );
+
+    {% endif %}
+
+
+    /*
+     * Stop polling when the user leaves the page.
+     */
+
+    window.addEventListener(
+        "beforeunload",
+        function () {
+
+            stopPolling();
+
+        }
+    );
+
+</script>
+
+</body>
+</html>
