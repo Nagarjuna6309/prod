@@ -1,159 +1,288 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forgot Password</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#2563eb">
+    <title>Forgot Password | Noti5me</title>
 
     <style>
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            justify-content: center;
             padding: 20px;
+            background: linear-gradient(135deg, #eff6ff, #f8fafc);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                Roboto, Arial, sans-serif;
+            color: #0f172a;
         }
 
-        .container {
+        .card {
             width: 100%;
-            max-width: 400px;
-            background: white;
-            padding: 35px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,.2);
+            max-width: 420px;
+            padding: 32px 28px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 28px;
+            color: #2563eb;
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .brand-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+            border-radius: 16px;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 1.8rem;
         }
 
         h1 {
-            text-align: center;
             margin-bottom: 10px;
-            color: #333;
+            font-size: 1.55rem;
+            font-weight: 750;
+            letter-spacing: -0.4px;
         }
 
-        .subtitle {
-            text-align: center;
-            color: #777;
+        .description {
             margin-bottom: 25px;
+            color: #64748b;
+            font-size: 0.93rem;
+            line-height: 1.65;
         }
 
-        .messages {
+        .form-group {
             margin-bottom: 20px;
-        }
-
-        .message {
-            padding: 10px;
-            border-radius: 6px;
-            background: #ffe5e5;
-            color: #d60000;
-            margin-bottom: 8px;
-            text-align: center;
-            font-size: 14px;
         }
 
         label {
             display: block;
-            margin-bottom: 7px;
-            font-weight: bold;
-            color: #333;
+            margin-bottom: 8px;
+            color: #334155;
+            font-size: 0.9rem;
+            font-weight: 650;
         }
 
-        input {
+        input[type="email"] {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 15px;
-            margin-bottom: 20px;
+            min-height: 49px;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            background: #fff;
+            color: #0f172a;
+            font: inherit;
+            font-size: 0.95rem;
             outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        input:focus {
-            border-color: #667eea;
+        input[type="email"]::placeholder {
+            color: #94a3b8;
         }
 
-        button {
+        input[type="email"]:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.13);
+        }
+
+        .hint {
+            display: block;
+            margin-top: 8px;
+            color: #64748b;
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .btn-submit {
             width: 100%;
-            padding: 13px;
+            min-height: 49px;
+            padding: 13px 16px;
             border: none;
-            border-radius: 6px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 9px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 0.96rem;
+            font-weight: 700;
             cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
         }
 
-        button:hover {
-            opacity: .9;
+        .btn-submit:hover {
+            background: #1d4ed8;
         }
 
-        .back {
-            text-align: center;
-            margin-top: 20px;
+        .btn-submit:active {
+            transform: scale(0.99);
         }
 
-        .back a {
-            color: #667eea;
+        .btn-submit:focus-visible,
+        .back-link:focus-visible {
+            outline: 3px solid #93c5fd;
+            outline-offset: 3px;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 23px;
+            color: #64748b;
+            font-size: 0.88rem;
+            font-weight: 600;
             text-decoration: none;
-            font-weight: bold;
+        }
+
+        .back-link:hover {
+            color: #2563eb;
+        }
+
+        .alert {
+            padding: 12px 14px;
+            margin-bottom: 17px;
+            border: 1px solid;
+            border-radius: 9px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            color: #1e40af;
+            border-color: #bfdbfe;
+        }
+
+        .footer {
+            margin-top: 27px;
+            color: #94a3b8;
+            font-size: 0.78rem;
+            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 27px 21px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
         }
     </style>
 </head>
 
 <body>
+    <main class="card">
+        <div class="brand">
+            <span class="brand-icon" aria-hidden="true">N</span>
+            Noti5me
+        </div>
 
-<div class="container">
+        <div class="icon" aria-hidden="true">✉️</div>
 
-    <h1>Forgot Password?</h1>
+        <h1>Forgot your password?</h1>
 
-    <p class="subtitle">
-        Enter your registered email address
-    </p>
+        <p class="description">
+            Don't worry. Enter the email address registered with your
+            Noti5me account. If an account matches, we'll send you a
+            six-digit verification code to reset your password.
+        </p>
 
-    {% if messages %}
-        <div class="messages">
+        {% if messages %}
             {% for message in messages %}
-                <div class="message">
+                <div
+                    class="alert {% if message.tags == 'error' %}alert-error{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}"
+                    role="status"
+                    aria-live="polite"
+                >
                     {{ message }}
                 </div>
             {% endfor %}
-        </div>
-    {% endif %}
+        {% endif %}
 
-    <form method="POST">
-        {% csrf_token %}
+        <form method="POST" action="" autocomplete="on">
+            {% csrf_token %}
 
-        <label for="email">
-            Email Address
-        </label>
+            <div class="form-group">
+                <label for="email">Registered email address</label>
 
-        <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Enter your registered email"
-            value="{{ request.POST.email|default:'' }}"
-            required
-        >
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="name@example.com"
+                    autocomplete="email"
+                    maxlength="254"
+                    required
+                    autofocus
+                    aria-describedby="email-hint"
+                >
 
-        <button type="submit">
-            Send OTP
-        </button>
-    </form>
+                <span class="hint" id="email-hint">
+                    Enter an email inbox you can access.
+                </span>
+            </div>
 
-    <div class="back">
-        <a href="{% url 'login' %}">
-            ← Back to Login
+            <button type="submit" class="btn-submit">
+                Send verification code
+            </button>
+        </form>
+
+        <a href="{% url 'login' %}" class="back-link">
+            <span aria-hidden="true">←</span>
+            Back to login
         </a>
-    </div>
 
-</div>
-
+        <div class="footer">
+            &copy; {% now "Y" %} Noti5me. All rights reserved.
+        </div>
+    </main>
 </body>
 </html>
