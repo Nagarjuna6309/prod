@@ -1,24 +1,34 @@
+
 {% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Schedule WhatsApp Message</title>
+    <title>{{ title|default:"Schedule WhatsApp Message" }} | Noti52me</title>
 
     <style>
         * {
             box-sizing: border-box;
         }
 
+        :root {
+            --black: #080808;
+            --black-soft: #111111;
+            --orange: #ff7a00;
+            --orange-light: #ff9d3d;
+            --green: #22c55e;
+            --green-dark: #16a34a;
+            --white: #ffffff;
+            --muted: #a1a1aa;
+            --border: rgba(255,255,255,0.09);
+        }
+
         body {
             margin: 0;
+            min-height: 100vh;
             font-family:
                 -apple-system,
                 BlinkMacSystemFont,
@@ -26,422 +36,479 @@
                 Roboto,
                 Arial,
                 sans-serif;
+            color: var(--white);
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(255,122,0,0.16),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 80%,
+                    rgba(34,197,94,0.12),
+                    transparent 30%
+                ),
+                var(--black);
+            overflow-x: hidden;
+        }
 
-            background: #f3f6f9;
-            color: #1f2937;
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+            animation: floatOrb 8s ease-in-out infinite alternate;
+        }
+
+        body::before {
+            top: -100px;
+            left: -100px;
+            background: var(--orange);
+        }
+
+        body::after {
+            right: -100px;
+            bottom: -100px;
+            background: var(--green);
+            animation-delay: 2s;
+        }
+
+        @keyframes floatOrb {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(40px, 30px) scale(1.15);
+            }
         }
 
         .page {
             min-height: 100vh;
-            padding: 40px 20px;
+            padding: 30px 16px 50px;
         }
 
         .container {
             width: 100%;
-            max-width: 850px;
-            margin: 0 auto;
+            max-width: 760px;
+            margin: auto;
         }
 
-        /* -------------------------------------------------- */
-        /* Header */
-        /* -------------------------------------------------- */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 25px;
+            animation: slideDown .7s ease;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: linear-gradient(
+                135deg,
+                var(--orange),
+                #ff4d00
+            );
+            color: #000;
+            font-size: 22px;
+            font-weight: 900;
+            box-shadow:
+                0 0 25px rgba(255,122,0,.25);
+            animation: iconPulse 2.5s ease-in-out infinite;
+        }
+
+        .brand-name {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-name span {
+            color: var(--orange);
+        }
+
+        .back-home {
+            color: #fff;
+            text-decoration: none;
+            padding: 9px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255,255,255,.04);
+            transition: .25s ease;
+        }
+
+        .back-home:hover {
+            border-color: var(--orange);
+            color: var(--orange);
+            transform: translateY(-2px);
+        }
+
+        .card {
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.07),
+                    rgba(255,255,255,.025)
+                );
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow:
+                0 25px 80px rgba(0,0,0,.45);
+            backdrop-filter: blur(16px);
+            animation: cardEnter .8s cubic-bezier(.2,.8,.2,1);
+        }
 
         .header {
-            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-bottom: 22px;
+            margin-bottom: 22px;
+            border-bottom: 1px solid var(--border);
         }
 
         .header h1 {
-            margin: 0 0 8px;
-            color: #111827;
-            font-size: 30px;
+            margin: 0;
+            font-size: 27px;
+            font-weight: 800;
         }
 
         .header p {
-            margin: 0;
-            color: #6b7280;
-            font-size: 15px;
+            margin: 7px 0 0;
+            color: var(--muted);
+            font-size: 13px;
         }
 
-        /* -------------------------------------------------- */
-        /* Card */
-        /* -------------------------------------------------- */
-
-        .card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 16px;
-
-            box-shadow:
-                0 8px 30px rgba(0, 0, 0, 0.07);
-        }
-
-        /* -------------------------------------------------- */
-        /* Connection status */
-        /* -------------------------------------------------- */
-
-        .connection-status {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            gap: 15px;
-
-            margin-bottom: 25px;
-            padding: 15px 18px;
-
-            border-radius: 10px;
-        }
-
-        .connection-status.connected {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-        }
-
-        .connection-status.disconnected {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-        }
-
-        .connection-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .connection-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .connection-dot.connected {
-            background: #16a34a;
-        }
-
-        .connection-dot.disconnected {
-            background: #d97706;
-        }
-
-        .connection-title {
-            margin: 0 0 3px;
-            font-size: 14px;
+        .connection {
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 12px;
             font-weight: 700;
-        }
-
-        .connection-description {
-            margin: 0;
-            color: #6b7280;
-            font-size: 13px;
-        }
-
-        .connection-link {
-            color: #15803d;
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
             white-space: nowrap;
         }
 
-        .connection-link:hover {
-            text-decoration: underline;
+        .connected {
+            color: #86efac;
+            background: rgba(34,197,94,.1);
+            border: 1px solid rgba(34,197,94,.25);
         }
 
-        /* -------------------------------------------------- */
-        /* Form */
-        /* -------------------------------------------------- */
-
-        .form-group {
-            margin-bottom: 23px;
+        .disconnected {
+            color: #fdba74;
+            background: rgba(255,122,0,.1);
+            border: 1px solid rgba(255,122,0,.25);
         }
 
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-
-            color: #111827;
-            font-size: 14px;
-            font-weight: 700;
+        .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 7px;
+            background: currentColor;
         }
 
-        .required {
-            color: #dc2626;
+        .connected .dot {
+            animation: pulseGreen 1.5s infinite;
         }
-
-        .form-control {
-            display: block;
-
-            width: 100%;
-
-            padding: 12px 14px;
-
-            border: 1px solid #d1d5db;
-            border-radius: 9px;
-
-            background: #ffffff;
-            color: #111827;
-
-            font-family: inherit;
-            font-size: 15px;
-
-            outline: none;
-
-            transition:
-                border-color 0.15s ease,
-                box-shadow 0.15s ease;
-        }
-
-        .form-control:focus {
-            border-color: #16a34a;
-
-            box-shadow:
-                0 0 0 3px rgba(22, 163, 74, 0.12);
-        }
-
-        textarea.form-control {
-            min-height: 150px;
-            resize: vertical;
-            line-height: 1.5;
-        }
-
-        input[type="datetime-local"].form-control {
-            cursor: pointer;
-        }
-
-        .help-text {
-            margin: 7px 0 0;
-
-            color: #6b7280;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        .error-list {
-            margin: 7px 0 0;
-            padding: 0;
-
-            list-style: none;
-
-            color: #dc2626;
-            font-size: 13px;
-        }
-
-        .field-error {
-            border-color: #dc2626 !important;
-        }
-
-        /* -------------------------------------------------- */
-        /* Character count */
-        /* -------------------------------------------------- */
-
-        .message-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            margin-top: 7px;
-        }
-
-        .character-count {
-            color: #6b7280;
-            font-size: 12px;
-        }
-
-        /* -------------------------------------------------- */
-        /* Buttons */
-        /* -------------------------------------------------- */
-
-        .actions {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-
-            gap: 12px;
-
-            margin-top: 30px;
-            padding-top: 22px;
-
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .btn {
-            display: inline-flex;
-
-            align-items: center;
-            justify-content: center;
-
-            min-height: 44px;
-
-            padding: 10px 20px;
-
-            border: none;
-            border-radius: 9px;
-
-            font-family: inherit;
-            font-size: 14px;
-            font-weight: 600;
-
-            text-decoration: none;
-
-            cursor: pointer;
-
-            transition:
-                background 0.15s ease,
-                transform 0.15s ease,
-                opacity 0.15s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-primary {
-            background: #16a34a;
-            color: #ffffff;
-        }
-
-        .btn-primary:hover {
-            background: #15803d;
-        }
-
-        .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
-        }
-
-        .btn-secondary:hover {
-            background: #d1d5db;
-        }
-
-        /* -------------------------------------------------- */
-        /* Alerts */
-        /* -------------------------------------------------- */
 
         .alert {
-            padding: 14px 16px;
-            margin-bottom: 20px;
-
-            border-radius: 10px;
-
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .alert-success {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            color: #166534;
+            padding: 13px 15px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            animation: fadeUp .5s ease;
         }
 
         .alert-error {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
+            color: #fecaca;
+            background: rgba(220,38,38,.12);
+            border: 1px solid rgba(220,38,38,.25);
         }
 
-        .alert-warning {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            color: #92400e;
+        .alert-success {
+            color: #bbf7d0;
+            background: rgba(34,197,94,.10);
+            border: 1px solid rgba(34,197,94,.25);
         }
 
-        /* -------------------------------------------------- */
-        /* Message preview */
-        /* -------------------------------------------------- */
-
-        .preview {
-            margin-top: 25px;
-            padding: 18px;
-
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .preview-title {
-            margin: 0 0 10px;
+        .field {
+            animation: fadeUp .55s ease both;
+        }
 
-            color: #374151;
+        .field:nth-child(2) {
+            animation-delay: .08s;
+        }
+
+        .field:nth-child(3) {
+            animation-delay: .16s;
+        }
+
+        .field:nth-child(4) {
+            animation-delay: .24s;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d4d4d8;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 13px 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,.12);
+            background: rgba(0,0,0,.35);
+            color: #fff;
+            outline: none;
+            font-family: inherit;
+            transition: .25s ease;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--orange);
+            box-shadow:
+                0 0 0 3px rgba(255,122,0,.12),
+                0 0 25px rgba(255,122,0,.08);
+            transform: translateY(-1px);
+        }
+
+        textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        select option {
+            background: #111;
+        }
+
+        .help {
+            margin-top: 6px;
+            color: #71717a;
+            font-size: 11px;
+        }
+
+        .error {
+            margin-top: 6px;
+            color: #fca5a5;
+            font-size: 12px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 11px;
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-family: inherit;
             font-size: 13px;
+            font-weight: 800;
+            transition: .25s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-home {
+            color: #fff;
+            background: rgba(255,255,255,.05);
+            border-color: var(--border);
+        }
+
+        .btn-home:hover {
+            color: var(--orange);
+            border-color: var(--orange);
+        }
+
+        .btn-list {
+            color: #86efac;
+            background: rgba(34,197,94,.08);
+            border-color: rgba(34,197,94,.22);
+        }
+
+        .btn-list:hover {
+            background: var(--green);
+            color: #000;
+        }
+
+        .btn-submit {
+            color: #000;
+            background: linear-gradient(
+                135deg,
+                var(--orange),
+                var(--orange-light)
+            );
+            box-shadow:
+                0 8px 25px rgba(255,122,0,.2);
+        }
+
+        .btn-submit:hover {
+            box-shadow:
+                0 12px 35px rgba(255,122,0,.35);
+        }
+
+        .connect-link {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .connect-link a {
+            color: var(--orange);
+            text-decoration: none;
+            font-size: 12px;
             font-weight: 700;
         }
 
-        .preview-message {
-            margin: 0;
-
-            color: #4b5563;
-
-            font-size: 14px;
-            line-height: 1.6;
-
-            white-space: pre-wrap;
-            word-break: break-word;
+        .connect-link a:hover {
+            text-decoration: underline;
         }
 
-        /* -------------------------------------------------- */
-        /* Loading */
-        /* -------------------------------------------------- */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
 
-        .spinner {
-            width: 16px;
-            height: 16px;
-
-            margin-right: 8px;
-
-            border: 2px solid rgba(255, 255, 255, 0.45);
-            border-top-color: #ffffff;
-
-            border-radius: 50%;
-
-            animation: spin 0.7s linear infinite;
-        }
-
-        @keyframes spin {
             to {
-                transform: rotate(360deg);
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
-        .hidden {
-            display: none !important;
+        @keyframes cardEnter {
+            from {
+                opacity: 0;
+                transform: translateY(35px) scale(.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
-        /* -------------------------------------------------- */
-        /* Mobile */
-        /* -------------------------------------------------- */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
 
-        @media (max-width: 600px) {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes iconPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.06);
+            }
+        }
+
+        @keyframes pulseGreen {
+            0% {
+                box-shadow: 0 0 0 0 rgba(34,197,94,.6);
+            }
+
+            70% {
+                box-shadow: 0 0 0 7px rgba(34,197,94,0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(34,197,94,0);
+            }
+        }
+
+        @media (max-width: 650px) {
 
             .page {
-                padding: 25px 12px;
+                padding: 20px 12px 35px;
             }
 
             .card {
                 padding: 20px;
-                border-radius: 12px;
+                border-radius: 18px;
             }
 
-            .header h1 {
-                font-size: 25px;
-            }
-
-            .connection-status {
+            .header {
                 align-items: flex-start;
                 flex-direction: column;
             }
 
+            .connection {
+                width: 100%;
+            }
+
             .actions {
-                flex-direction: column-reverse;
+                flex-direction: column;
             }
 
             .btn {
                 width: 100%;
+            }
+
+            .topbar {
+                align-items: flex-start;
+            }
+
+            .back-home {
+                font-size: 12px;
             }
         }
     </style>
@@ -453,669 +520,144 @@
 
     <div class="container">
 
-        <!-- ================================================= -->
-        <!-- HEADER -->
-        <!-- ================================================= -->
+        <div class="topbar">
+            <div class="brand">
+                <div class="brand-icon">N</div>
 
-        <div class="header">
+                <h2 class="brand-name">
+                    Noti<span>52</span>me
+                </h2>
+            </div>
 
-            <h1>
-                Schedule WhatsApp Message
-            </h1>
-
-            <p>
-                Choose a WhatsApp number, write your message,
-                and select when it should be sent.
-            </p>
-
+            <a href="{% url 'home' %}" class="back-home">
+                ← Home
+            </a>
         </div>
 
+        <div class="card">
 
-        <!-- ================================================= -->
-        <!-- DJANGO MESSAGES -->
-        <!-- ================================================= -->
-
-        {% if messages %}
-
-            {% for message in messages %}
-
-                <div
-                    class="
-                        alert
-                        {% if message.tags == 'success' %}
-                            alert-success
-                        {% elif message.tags == 'error' %}
-                            alert-error
-                        {% else %}
-                            alert-warning
-                        {% endif %}
-                    "
-                >
-                    {{ message }}
-                </div>
-
-            {% endfor %}
-
-        {% endif %}
-
-
-        <!-- ================================================= -->
-        <!-- CONNECTION STATUS -->
-        <!-- ================================================= -->
-
-        <div
-            class="
-                connection-status
-                {% if is_connected %}
-                    connected
-                {% else %}
-                    disconnected
-                {% endif %}
-            "
-        >
-
-            <div class="connection-left">
-
-                <span
-                    class="
-                        connection-dot
-                        {% if is_connected %}
-                            connected
-                        {% else %}
-                            disconnected
-                        {% endif %}
-                    "
-                ></span>
+            <div class="header">
 
                 <div>
+                    <h1>Schedule WhatsApp</h1>
 
-                    <p class="connection-title">
-
-                        {% if is_connected %}
-                            WhatsApp Connected
-                        {% else %}
-                            WhatsApp Disconnected
-                        {% endif %}
-
+                    <p>
+                        Schedule your WhatsApp message for a future date
+                        and time.
                     </p>
+                </div>
 
-                    <p class="connection-description">
+                <div
+                    class="connection {% if is_connected %}connected{% else %}disconnected{% endif %}"
+                >
+                    <span class="dot"></span>
 
-                        {% if is_connected %}
-
-                            Your WhatsApp account is connected
-                            and ready.
-
-                        {% else %}
-
-                            You can schedule the message, but
-                            WhatsApp must be connected when the
-                            scheduled task runs.
-
-                        {% endif %}
-
-                    </p>
-
+                    {% if is_connected %}
+                        WhatsApp Connected
+                    {% else %}
+                        WhatsApp Disconnected
+                    {% endif %}
                 </div>
 
             </div>
 
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "currently disconnected" not in message.message %}
+                        <div class="
+                            alert
+                            {% if message.tags == 'error' %}
+                                alert-error
+                            {% else %}
+                                alert-success
+                            {% endif %}
+                        ">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
 
-            <a
-                href="{% url 'whatsapp_messages:connect_whatsapp' %}"
-                class="connection-link"
-            >
-                {% if is_connected %}
-                    Connection Settings
-                {% else %}
-                    Connect WhatsApp
-                {% endif %}
-            </a>
+            {% if not is_connected %}
+                <div class="alert alert-error">
+                    ⚠️ WhatsApp is currently disconnected.
+                    Your message can still be scheduled, but it will
+                    only send after WhatsApp is connected.
+                </div>
+            {% endif %}
 
-        </div>
-
-
-        <!-- ================================================= -->
-        <!-- FORM CARD -->
-        <!-- ================================================= -->
-
-        <div class="card">
-
-            <form
-                method="post"
-                id="scheduleForm"
-                novalidate
-            >
+            <form method="post" novalidate class="form">
 
                 {% csrf_token %}
 
+                {% for field in form %}
 
-                <!-- ========================================= -->
-                <!-- PHONE NUMBER -->
-                <!-- ========================================= -->
+                    <div class="field">
 
-                <div class="form-group">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
 
-                    <label
-                        for="{{ form.phone_number.id_for_label }}"
-                        class="form-label"
-                    >
-                        WhatsApp Number
-                        <span class="required">*</span>
-                    </label>
+                        {{ field }}
 
+                        {% if field.help_text %}
+                            <div class="help">
+                                {{ field.help_text }}
+                            </div>
+                        {% endif %}
 
-                    <input
-                        type="text"
-                        name="{{ form.phone_number.html_name }}"
-                        id="{{ form.phone_number.id_for_label }}"
-                        value="{{ form.phone_number.value|default:'' }}"
-                        class="
-                            form-control
-                            {% if form.phone_number.errors %}
-                                field-error
-                            {% endif %}
-                        "
-                        placeholder="919876543210"
-                        autocomplete="tel"
-                        inputmode="numeric"
-                        required
-                    >
-
-
-                    {% if form.phone_number.errors %}
-
-                        <ul class="error-list">
-
-                            {% for error in form.phone_number.errors %}
-
-                                <li>
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="error">
                                     {{ error }}
-                                </li>
-
+                                </div>
                             {% endfor %}
-
-                        </ul>
-
-                    {% else %}
-
-                        <p class="help-text">
-                            Enter the country code followed by the
-                            phone number. Example:
-                            <strong>919876543210</strong>
-                        </p>
-
-                    {% endif %}
-
-                </div>
-
-
-                <!-- ========================================= -->
-                <!-- MESSAGE -->
-                <!-- ========================================= -->
-
-                <div class="form-group">
-
-                    <label
-                        for="{{ form.message.id_for_label }}"
-                        class="form-label"
-                    >
-                        Message
-                        <span class="required">*</span>
-                    </label>
-
-
-                    <textarea
-                        name="{{ form.message.html_name }}"
-                        id="{{ form.message.id_for_label }}"
-                        class="
-                            form-control
-                            {% if form.message.errors %}
-                                field-error
-                            {% endif %}
-                        "
-                        placeholder="Type your WhatsApp message..."
-                        rows="6"
-                        maxlength="10000"
-                        required
-                    >{{ form.message.value|default:'' }}</textarea>
-
-
-                    <div class="message-footer">
-
-                        <div>
-
-                            {% if form.message.errors %}
-
-                                <ul class="error-list">
-
-                                    {% for error in form.message.errors %}
-
-                                        <li>
-                                            {{ error }}
-                                        </li>
-
-                                    {% endfor %}
-
-                                </ul>
-
-                            {% else %}
-
-                                <p class="help-text">
-                                    Enter the message you want to
-                                    send at the scheduled time.
-                                </p>
-
-                            {% endif %}
-
-                        </div>
-
-
-                        <span
-                            id="characterCount"
-                            class="character-count"
-                        >
-                            0 characters
-                        </span>
+                        {% endif %}
 
                     </div>
 
-                </div>
-
-
-                <!-- ========================================= -->
-                <!-- SCHEDULE DATE/TIME -->
-                <!-- ========================================= -->
-
-                <div class="form-group">
-
-                    <label
-                        for="{{ form.scheduled_at.id_for_label }}"
-                        class="form-label"
-                    >
-                        Schedule Date &amp; Time
-                        <span class="required">*</span>
-                    </label>
-
-
-                    <input
-                        type="datetime-local"
-                        name="{{ form.scheduled_at.html_name }}"
-                        id="{{ form.scheduled_at.id_for_label }}"
-                        value="{{ form.scheduled_at.value|default:'' }}"
-                        class="
-                            form-control
-                            {% if form.scheduled_at.errors %}
-                                field-error
-                            {% endif %}
-                        "
-                        required
-                    >
-
-
-                    {% if form.scheduled_at.errors %}
-
-                        <ul class="error-list">
-
-                            {% for error in form.scheduled_at.errors %}
-
-                                <li>
-                                    {{ error }}
-                                </li>
-
-                            {% endfor %}
-
-                        </ul>
-
-                    {% else %}
-
-                        <p class="help-text">
-                            Select a future date and time. The
-                            message will be handed to Celery for
-                            delivery at this time.
-                        </p>
-
-                    {% endif %}
-
-                </div>
-
-
-                <!-- ========================================= -->
-                <!-- PREVIEW -->
-                <!-- ========================================= -->
-
-                <div class="preview">
-
-                    <p class="preview-title">
-                        Message Preview
-                    </p>
-
-                    <p
-                        id="previewMessage"
-                        class="preview-message"
-                    >
-                        Your message preview will appear here.
-                    </p>
-
-                </div>
-
-
-                <!-- ========================================= -->
-                <!-- BUTTONS -->
-                <!-- ========================================= -->
+                {% endfor %}
 
                 <div class="actions">
 
                     <a
-                        href="{% url 'whatsapp_messages:scheduled_messages' %}"
-                        class="btn btn-secondary"
+                        href="{% url 'home' %}"
+                        class="btn btn-home"
                     >
-                        Cancel
+                        ← Home
                     </a>
 
+                    <a
+                        href="{% url 'whatsapp_messages:scheduled_messages' %}"
+                        class="btn btn-list"
+                    >
+                        📅 Scheduled
+                    </a>
 
                     <button
                         type="submit"
-                        id="submitButton"
-                        class="btn btn-primary"
+                        class="btn btn-submit"
                     >
-                        <span
-                            id="submitSpinner"
-                            class="spinner hidden"
-                        ></span>
-
-                        <span id="submitText">
-                            Schedule Message
-                        </span>
-
+                        🟢 Schedule Message
                     </button>
 
                 </div>
 
             </form>
 
+            {% if not is_connected %}
+                <div class="connect-link">
+                    <a href="{% url 'whatsapp_messages:connect_whatsapp' %}">
+                        Connect WhatsApp before sending →
+                    </a>
+                </div>
+            {% endif %}
+
         </div>
 
     </div>
 
 </div>
-
-
-<script>
-
-    /*
-     * =========================================================
-     * Elements
-     * =========================================================
-     */
-
-    const phoneInput =
-        document.getElementById(
-            "{{ form.phone_number.id_for_label }}"
-        );
-
-    const messageInput =
-        document.getElementById(
-            "{{ form.message.id_for_label }}"
-        );
-
-    const scheduledAtInput =
-        document.getElementById(
-            "{{ form.scheduled_at.id_for_label }}"
-        );
-
-    const scheduleForm =
-        document.getElementById(
-            "scheduleForm"
-        );
-
-    const characterCount =
-        document.getElementById(
-            "characterCount"
-        );
-
-    const previewMessage =
-        document.getElementById(
-            "previewMessage"
-        );
-
-    const submitButton =
-        document.getElementById(
-            "submitButton"
-        );
-
-    const submitSpinner =
-        document.getElementById(
-            "submitSpinner"
-        );
-
-    const submitText =
-        document.getElementById(
-            "submitText"
-        );
-
-
-    /*
-     * =========================================================
-     * Set minimum datetime
-     * =========================================================
-     */
-
-    function setMinimumDateTime() {
-
-        if (!scheduledAtInput) {
-            return;
-        }
-
-        const now = new Date();
-
-        /*
-         * datetime-local expects:
-         *
-         * YYYY-MM-DDTHH:MM
-         */
-
-        const year =
-            now.getFullYear();
-
-        const month =
-            String(
-                now.getMonth() + 1
-            ).padStart(2, "0");
-
-        const day =
-            String(
-                now.getDate()
-            ).padStart(2, "0");
-
-        const hours =
-            String(
-                now.getHours()
-            ).padStart(2, "0");
-
-        const minutes =
-            String(
-                now.getMinutes()
-            ).padStart(2, "0");
-
-
-        scheduledAtInput.min =
-            `${year}-${month}-${day}T${hours}:${minutes}`;
-
-    }
-
-
-    /*
-     * =========================================================
-     * Character counter
-     * =========================================================
-     */
-
-    function updateCharacterCount() {
-
-        if (!messageInput || !characterCount) {
-            return;
-        }
-
-        const length =
-            messageInput.value.length;
-
-        characterCount.textContent =
-            `${length} character${length === 1 ? "" : "s"}`;
-
-    }
-
-
-    /*
-     * =========================================================
-     * Message preview
-     * =========================================================
-     */
-
-    function updatePreview() {
-
-        if (!messageInput || !previewMessage) {
-            return;
-        }
-
-        const text =
-            messageInput.value.trim();
-
-        if (text) {
-
-            previewMessage.textContent =
-                text;
-
-        } else {
-
-            previewMessage.textContent =
-                "Your message preview will appear here.";
-
-        }
-
-    }
-
-
-    /*
-     * =========================================================
-     * Phone number formatting
-     * =========================================================
-     */
-
-    if (phoneInput) {
-
-        phoneInput.addEventListener(
-            "input",
-            function () {
-
-                /*
-                 * Keep digits only.
-                 *
-                 * This matches the clean-up performed
-                 * by the Django form.
-                 */
-
-                this.value =
-                    this.value.replace(
-                        /\D/g,
-                        ""
-                    );
-
-            }
-        );
-
-    }
-
-
-    /*
-     * =========================================================
-     * Message events
-     * =========================================================
-     */
-
-    if (messageInput) {
-
-        messageInput.addEventListener(
-            "input",
-            function () {
-
-                updateCharacterCount();
-                updatePreview();
-
-            }
-        );
-
-    }
-
-
-    /*
-     * =========================================================
-     * Form submit
-     * =========================================================
-     */
-
-    if (scheduleForm) {
-
-        scheduleForm.addEventListener(
-            "submit",
-            function (event) {
-
-                /*
-                 * Basic browser-side validation.
-                 * Django performs the real validation.
-                 */
-
-                if (
-                    !phoneInput.value.trim()
-                    ||
-                    !messageInput.value.trim()
-                    ||
-                    !scheduledAtInput.value
-                ) {
-
-                    return;
-                }
-
-
-                /*
-                 * Prevent accidental double submission.
-                 */
-
-                submitButton.disabled = true;
-
-                submitSpinner.classList.remove(
-                    "hidden"
-                );
-
-                submitText.textContent =
-                    "Scheduling...";
-
-            }
-        );
-
-    }
-
-
-    /*
-     * =========================================================
-     * Initial page setup
-     * =========================================================
-     */
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        function () {
-
-            setMinimumDateTime();
-
-            updateCharacterCount();
-
-            updatePreview();
-
-        }
-    );
-
-</script>
 
 </body>
 </html>

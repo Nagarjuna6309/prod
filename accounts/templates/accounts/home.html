@@ -1,0 +1,1012 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Noti52me | Smart Scheduling</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+
+            background:
+                radial-gradient(circle at 10% 10%, rgba(255, 107, 0, 0.12), transparent 30%),
+                radial-gradient(circle at 90% 20%, rgba(34, 197, 94, 0.10), transparent 30%),
+                #050505;
+
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* =====================================================
+           BACKGROUND ANIMATION
+        ===================================================== */
+
+        .background {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            animation: floatOrb 10s ease-in-out infinite;
+        }
+
+        .orb.orange {
+            width: 300px;
+            height: 300px;
+            background: #ff6b00;
+            top: -100px;
+            left: -80px;
+        }
+
+        .orb.green {
+            width: 280px;
+            height: 280px;
+            background: #22c55e;
+            right: -100px;
+            top: 35%;
+            animation-delay: 2s;
+        }
+
+        .orb.orange2 {
+            width: 220px;
+            height: 220px;
+            background: #ff8a00;
+            bottom: -80px;
+            left: 40%;
+            animation-delay: 4s;
+        }
+
+        @keyframes floatOrb {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(35px, -30px) scale(1.15);
+            }
+        }
+
+        /* =====================================================
+           NAVBAR
+        ===================================================== */
+
+        .navbar {
+            position: relative;
+            z-index: 5;
+
+            width: 100%;
+            padding: 22px 6%;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(15px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(135deg, #ff6b00, #ff8a00);
+
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 900;
+
+            box-shadow:
+                0 0 25px rgba(255,107,0,0.35);
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-name span {
+            color: #ff6b00;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .user-name {
+            color: #d1d5db;
+            font-size: 14px;
+        }
+
+        .logout {
+            padding: 9px 15px;
+            border-radius: 9px;
+
+            color: #ffffff;
+            background: rgba(255,255,255,0.07);
+
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+
+            transition: 0.25s;
+        }
+
+        .logout:hover {
+            background: #ff6b00;
+            transform: translateY(-2px);
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .page {
+            position: relative;
+            z-index: 2;
+
+            width: 100%;
+            max-width: 1250px;
+
+            margin: auto;
+            padding: 70px 25px 50px;
+        }
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .hero {
+            text-align: center;
+            margin-bottom: 65px;
+
+            animation: fadeUp 0.8s ease both;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 8px 14px;
+
+            border: 1px solid rgba(255,107,0,0.35);
+            border-radius: 999px;
+
+            background: rgba(255,107,0,0.08);
+
+            color: #ff9a4d;
+            font-size: 12px;
+            font-weight: 700;
+
+            margin-bottom: 20px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+
+            box-shadow: 0 0 12px #22c55e;
+
+            animation: pulse 1.6s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.55;
+            }
+        }
+
+        .hero h1 {
+            margin: 0;
+
+            font-size: clamp(42px, 7vw, 78px);
+            line-height: 1;
+
+            font-weight: 900;
+            letter-spacing: -3px;
+        }
+
+        .hero h1 .orange {
+            color: #ff6b00;
+        }
+
+        .hero h1 .green {
+            color: #22c55e;
+        }
+
+        .hero p {
+            max-width: 650px;
+
+            margin: 24px auto 0;
+
+            color: #9ca3af;
+
+            font-size: 17px;
+            line-height: 1.7;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =====================================================
+           SECTION
+        ===================================================== */
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 28px;
+
+            animation: fadeUp 0.9s ease both;
+        }
+
+        .section-title h2 {
+            margin: 0 0 8px;
+
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .section-title p {
+            margin: 0;
+
+            color: #737373;
+            font-size: 14px;
+        }
+
+        /* =====================================================
+           FEATURE GRID
+        ===================================================== */
+
+        .features {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 20px;
+        }
+
+        .feature {
+            position: relative;
+
+            min-height: 245px;
+
+            padding: 27px;
+
+            border-radius: 22px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,0.08),
+                    rgba(255,255,255,0.025)
+                );
+
+            border: 1px solid rgba(255,255,255,0.09);
+
+            backdrop-filter: blur(15px);
+
+            overflow: hidden;
+
+            transition:
+                transform 0.35s ease,
+                border-color 0.35s ease,
+                box-shadow 0.35s ease;
+
+            animation: cardIn 0.7s ease both;
+        }
+
+        .feature:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .feature:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .feature:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .feature:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feature:hover {
+            transform: translateY(-9px);
+
+            border-color: rgba(255,107,0,0.45);
+
+            box-shadow:
+                0 20px 50px rgba(0,0,0,0.45),
+                0 0 30px rgba(255,107,0,0.08);
+        }
+
+        .feature.active {
+            border-color: rgba(34,197,94,0.35);
+        }
+
+        .feature.active:hover {
+            border-color: rgba(34,197,94,0.7);
+
+            box-shadow:
+                0 20px 50px rgba(0,0,0,0.45),
+                0 0 35px rgba(34,197,94,0.12);
+        }
+
+        .feature-icon {
+            width: 58px;
+            height: 58px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 17px;
+
+            font-size: 28px;
+
+            margin-bottom: 20px;
+        }
+
+        .whatsapp-icon {
+            background: rgba(34,197,94,0.13);
+            color: #22c55e;
+        }
+
+        .future-icon {
+            background: rgba(255,107,0,0.11);
+            color: #ff8a3d;
+        }
+
+        .feature h3 {
+            margin: 0 0 9px;
+
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .feature p {
+            margin: 0;
+
+            color: #8d8d8d;
+
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .feature-button {
+            position: absolute;
+
+            left: 27px;
+            right: 27px;
+            bottom: 23px;
+
+            padding: 10px 14px;
+
+            border-radius: 10px;
+
+            text-align: center;
+
+            text-decoration: none;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            transition: 0.25s;
+        }
+
+        .feature-button.active {
+            background: #22c55e;
+            color: #03140a;
+        }
+
+        .feature-button.active:hover {
+            background: #16a34a;
+            color: white;
+        }
+
+        .coming {
+            background: rgba(255,107,0,0.07);
+            border: 1px solid rgba(255,107,0,0.15);
+
+            color: #ff9a4d;
+        }
+
+        /* =====================================================
+           COMING SOON BADGE
+        ===================================================== */
+
+        .coming-badge {
+            position: absolute;
+
+            top: 20px;
+            right: 20px;
+
+            padding: 6px 9px;
+
+            border-radius: 999px;
+
+            background: rgba(255,107,0,0.1);
+            border: 1px solid rgba(255,107,0,0.2);
+
+            color: #ff9a4d;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: 0.5px;
+
+            animation: badgePulse 2.5s infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% {
+                opacity: 0.65;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* =====================================================
+           ACCOUNT CARD
+        ===================================================== */
+
+        .account {
+            margin-top: 45px;
+
+            padding: 25px;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    120deg,
+                    rgba(255,107,0,0.08),
+                    rgba(34,197,94,0.05)
+                );
+
+            border: 1px solid rgba(255,255,255,0.08);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 52px;
+            height: 52px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff6b00,
+                    #22c55e
+                );
+
+            font-size: 20px;
+            font-weight: 900;
+
+            color: white;
+        }
+
+        .account h3 {
+            margin: 0 0 5px;
+            font-size: 16px;
+        }
+
+        .account p {
+            margin: 0;
+            color: #777;
+            font-size: 13px;
+        }
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        footer {
+            position: relative;
+            z-index: 2;
+
+            text-align: center;
+
+            padding: 25px;
+
+            border-top: 1px solid rgba(255,255,255,0.06);
+
+            color: #555;
+
+            font-size: 12px;
+        }
+
+        footer strong {
+            color: #ff6b00;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1000px) {
+            .features {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .navbar {
+                padding: 16px 20px;
+            }
+
+            .user-name {
+                display: none;
+            }
+
+            .page {
+                padding: 50px 16px 35px;
+            }
+
+            .hero {
+                margin-bottom: 45px;
+            }
+
+            .hero h1 {
+                font-size: 45px;
+                letter-spacing: -2px;
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .feature {
+                min-height: 225px;
+            }
+
+            .account {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="background">
+    <div class="orb orange"></div>
+    <div class="orb green"></div>
+    <div class="orb orange2"></div>
+</div>
+
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+
+<nav class="navbar">
+
+    <div class="brand">
+
+        <div class="brand-logo">
+            N
+        </div>
+
+        <div class="brand-name">
+            Noti<span>52</span>me
+        </div>
+
+    </div>
+
+    <div class="nav-user">
+
+        {% if user.is_authenticated %}
+
+            <span class="user-name">
+                Welcome,
+                {{ user.user_fullname|default:user.mobile }}
+            </span>
+
+            <a
+                href="{% url 'logout' %}"
+                class="logout"
+            >
+                Logout
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</nav>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="page">
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="hero-badge">
+
+            <span class="live-dot"></span>
+
+            Smart Scheduling Platform
+
+        </div>
+
+        <h1>
+            Automate.
+            <span class="orange">Schedule.</span>
+            <span class="green">Relax.</span>
+        </h1>
+
+        <p>
+            Manage your messages and social content from one
+            powerful platform. WhatsApp scheduling is ready now,
+            with more integrations coming soon.
+        </p>
+
+    </section>
+
+
+    <!-- SERVICES -->
+
+    <section>
+
+        <div class="section-title">
+
+            <h2>
+                What can you schedule?
+            </h2>
+
+            <p>
+                Choose a platform and automate your future.
+            </p>
+
+        </div>
+
+
+        <div class="features">
+
+            <!-- =================================================
+                 WHATSAPP — ACTIVE
+            ================================================= -->
+
+            <div class="feature active">
+
+                <div class="feature-icon whatsapp-icon">
+                    💬
+                </div>
+
+                <h3>
+                    WhatsApp
+                </h3>
+
+                <p>
+                    Schedule WhatsApp messages, connect your
+                    account and manage scheduled deliveries.
+                </p>
+
+                <a
+                    href="{% url 'whatsapp_messages:schedule_message' %}"
+                    class="feature-button active"
+                >
+                    Schedule WhatsApp
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 GMAIL
+            ================================================= -->
+
+            <div class="feature">
+
+                <div class="coming-badge">
+                    COMING SOON
+                </div>
+
+                <div class="feature-icon future-icon">
+                    ✉️
+                </div>
+
+                <h3>
+                    Gmail
+                </h3>
+
+                <p>
+                    Schedule emails and automatically send them
+                    at the perfect time.
+                </p>
+
+                <div class="feature-button coming">
+                    Coming Soon
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 YOUTUBE
+            ================================================= -->
+
+            <div class="feature">
+
+                <div class="coming-badge">
+                    COMING SOON
+                </div>
+
+                <div class="feature-icon future-icon">
+                    ▶
+                </div>
+
+                <h3>
+                    YouTube
+                </h3>
+
+                <p>
+                    Plan and schedule your YouTube content,
+                    uploads and publishing workflow.
+                </p>
+
+                <div class="feature-button coming">
+                    Coming Soon
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 INSTAGRAM
+            ================================================= -->
+
+            <div class="feature">
+
+                <div class="coming-badge">
+                    COMING SOON
+                </div>
+
+                <div class="feature-icon future-icon">
+                    ◎
+                </div>
+
+                <h3>
+                    Instagram
+                </h3>
+
+                <p>
+                    Schedule Instagram posts and manage your
+                    future social media content.
+                </p>
+
+                <div class="feature-button coming">
+                    Coming Soon
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 X / TWITTER
+            ================================================= -->
+
+            <div class="feature">
+
+                <div class="coming-badge">
+                    COMING SOON
+                </div>
+
+                <div class="feature-icon future-icon">
+                    𝕏
+                </div>
+
+                <h3>
+                    X (Twitter)
+                </h3>
+
+                <p>
+                    Schedule posts for X and keep your social
+                    media presence active automatically.
+                </p>
+
+                <div class="feature-button coming">
+                    Coming Soon
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ACCOUNT
+    ===================================================== -->
+
+    {% if user.is_authenticated %}
+
+    <section class="account">
+
+        <div class="account-info">
+
+            <div class="avatar">
+
+                {{ user.user_fullname|default:user.mobile|first|upper }}
+
+            </div>
+
+            <div>
+
+                <h3>
+                    {{ user.user_fullname|default:"Noti52me User" }}
+                </h3>
+
+                <p>
+                    {{ user.mail|default:user.mobile }}
+                </p>
+
+            </div>
+
+        </div>
+
+        <div>
+            <span
+                style="
+                    color:#22c55e;
+                    font-size:13px;
+                    font-weight:700;
+                "
+            >
+                ● Account Active
+            </span>
+        </div>
+
+    </section>
+
+    {% endif %}
+
+</main>
+
+
+<footer>
+
+    <strong>Noti52me</strong>
+    &nbsp;•&nbsp;
+    Smart scheduling for your digital life.
+
+</footer>
+
+
+<script>
+
+    /*
+     * Small entrance animation for cards when the page loads.
+     */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const cards =
+                document.querySelectorAll(".feature");
+
+            cards.forEach(
+                function(card, index) {
+
+                    card.style.animationDelay =
+                        (index * 0.08) + "s";
+
+                }
+            );
+
+        }
+    );
+
+</script>
+
+</body>
+</html>

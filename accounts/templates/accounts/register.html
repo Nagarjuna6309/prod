@@ -1,0 +1,1018 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account - Noti5me</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #dc2626;
+            --success: #16a34a;
+        }
+
+        body {
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 30px 16px;
+
+            color: var(--text);
+
+            overflow-x: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 10% 20%,
+                    rgba(99, 102, 241, 0.25),
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at 90% 80%,
+                    rgba(139, 92, 246, 0.25),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    135deg,
+                    #eef2ff,
+                    #f8fafc,
+                    #f5f3ff
+                );
+        }
+
+        /* =========================
+           ANIMATED BACKGROUND
+        ========================= */
+
+        .background {
+            position: fixed;
+            inset: 0;
+
+            overflow: hidden;
+
+            pointer-events: none;
+
+            z-index: 0;
+        }
+
+        .orb {
+            position: absolute;
+
+            border-radius: 50%;
+
+            filter: blur(2px);
+
+            opacity: 0.35;
+
+            animation: float 12s ease-in-out infinite;
+        }
+
+        .orb-one {
+            width: 220px;
+            height: 220px;
+
+            background: #818cf8;
+
+            top: -70px;
+            left: -60px;
+        }
+
+        .orb-two {
+            width: 180px;
+            height: 180px;
+
+            background: #a78bfa;
+
+            right: -50px;
+            top: 20%;
+
+            animation-delay: -4s;
+        }
+
+        .orb-three {
+            width: 140px;
+            height: 140px;
+
+            background: #c4b5fd;
+
+            bottom: -40px;
+            left: 20%;
+
+            animation-delay: -8s;
+        }
+
+        @keyframes float {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(25px, -35px) scale(1.08);
+            }
+        }
+
+        /* =========================
+           CARD
+        ========================= */
+
+        .card {
+            position: relative;
+
+            z-index: 2;
+
+            width: 100%;
+            max-width: 450px;
+
+            padding: 38px 34px;
+
+            background: rgba(255, 255, 255, 0.88);
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            border: 1px solid rgba(255, 255, 255, 0.8);
+
+            border-radius: 24px;
+
+            box-shadow:
+                0 25px 70px rgba(15, 23, 42, 0.12),
+                0 8px 25px rgba(99, 102, 241, 0.08);
+
+            animation: cardAppear 0.8s ease forwards;
+
+            transform: translateY(25px);
+
+            opacity: 0;
+        }
+
+        @keyframes cardAppear {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* =========================
+           LOGO
+        ========================= */
+
+        .logo {
+            width: 58px;
+            height: 58px;
+
+            margin: 0 auto 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--secondary)
+                );
+
+            color: white;
+
+            font-size: 24px;
+            font-weight: 800;
+
+            box-shadow:
+                0 10px 25px rgba(99, 102, 241, 0.3);
+
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            text-align: center;
+
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            font-size: 1.65rem;
+
+            font-weight: 800;
+
+            letter-spacing: -0.5px;
+
+            margin-bottom: 7px;
+        }
+
+        .header p {
+            color: var(--muted);
+
+            font-size: 0.92rem;
+        }
+
+        /* =========================
+           MESSAGES
+        ========================= */
+
+        .alert {
+            padding: 12px 14px;
+
+            border-radius: 10px;
+
+            margin-bottom: 18px;
+
+            font-size: 0.85rem;
+
+            animation: alertIn 0.4s ease;
+        }
+
+        @keyframes alertIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-error {
+            background: #fef2f2;
+
+            color: #991b1b;
+
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+
+            color: #166534;
+
+            border: 1px solid #bbf7d0;
+        }
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .form-group {
+            margin-bottom: 19px;
+        }
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 0.86rem;
+
+            font-weight: 650;
+
+            color: #334155;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+
+            height: 48px;
+
+            padding: 0 14px;
+
+            border: 1.5px solid var(--border);
+
+            border-radius: 11px;
+
+            outline: none;
+
+            background: rgba(255, 255, 255, 0.85);
+
+            color: var(--text);
+
+            font-size: 0.95rem;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .form-group input:hover {
+            border-color: #c7d2fe;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+
+            background: white;
+
+            box-shadow:
+                0 0 0 4px rgba(99, 102, 241, 0.12);
+
+            transform: translateY(-1px);
+        }
+
+        .form-group input::placeholder {
+            color: #94a3b8;
+        }
+
+        /* =========================
+           PHONE
+        ========================= */
+
+        .phone-wrapper {
+            position: relative;
+        }
+
+        .phone-prefix {
+            position: absolute;
+
+            left: 14px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            color: #64748b;
+
+            font-size: 0.9rem;
+
+            font-weight: 700;
+
+            z-index: 2;
+
+            pointer-events: none;
+        }
+
+        .phone-input {
+            padding-left: 50px !important;
+            letter-spacing: 0.04em;
+        }
+
+        .field-help {
+            display: block;
+
+            margin-top: 5px;
+
+            font-size: 0.72rem;
+
+            color: #94a3b8;
+        }
+
+        /* =========================
+           PASSWORD
+        ========================= */
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+
+            right: 13px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            border: none;
+
+            background: transparent;
+
+            color: #64748b;
+
+            font-size: 0.78rem;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            padding: 4px;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        .password-strength {
+            height: 4px;
+
+            margin-top: 8px;
+
+            border-radius: 10px;
+
+            background: #e2e8f0;
+
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+
+            width: 0%;
+
+            border-radius: inherit;
+
+            transition:
+                width 0.3s ease,
+                background 0.3s ease;
+        }
+
+        .strength-text {
+            display: block;
+
+            margin-top: 5px;
+
+            font-size: 0.72rem;
+
+            color: var(--muted);
+        }
+
+        /* =========================
+           BUTTON
+        ========================= */
+
+        .btn {
+            position: relative;
+
+            width: 100%;
+
+            height: 50px;
+
+            margin-top: 5px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--secondary)
+                );
+
+            color: white;
+
+            font-size: 0.96rem;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 10px 25px rgba(99, 102, 241, 0.25);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .btn::before {
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+            left: -100%;
+
+            width: 60%;
+            height: 100%;
+
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.35),
+                transparent
+            );
+
+            transform: skewX(-20deg);
+
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 14px 30px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn:hover::before {
+            left: 130%;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.loading {
+            pointer-events: none;
+
+            opacity: 0.75;
+        }
+
+        .spinner {
+            display: none;
+
+            width: 18px;
+            height: 18px;
+
+            border: 2px solid rgba(255,255,255,0.4);
+
+            border-top-color: white;
+
+            border-radius: 50%;
+
+            animation: spin 0.7s linear infinite;
+
+            margin: auto;
+        }
+
+        .btn.loading .button-text {
+            display: none;
+        }
+
+        .btn.loading .spinner {
+            display: block;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer-note {
+            text-align: center;
+
+            margin-top: 23px;
+
+            font-size: 0.87rem;
+
+            color: var(--muted);
+        }
+
+        .footer-note a {
+            color: var(--primary);
+
+            font-weight: 700;
+
+            text-decoration: none;
+
+            transition: color 0.2s ease;
+        }
+
+        .footer-note a:hover {
+            color: var(--primary-dark);
+
+            text-decoration: underline;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 480px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 30px 22px;
+
+                border-radius: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.45rem;
+            }
+
+            .logo {
+                width: 52px;
+                height: 52px;
+
+                border-radius: 16px;
+
+                font-size: 21px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="background">
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+    <div class="orb orb-three"></div>
+</div>
+
+<div class="card">
+
+    <div class="logo">
+        N
+    </div>
+
+    <div class="header">
+
+        <h1>Create Account</h1>
+
+        <p>
+            Set up your Noti5me notification profile
+        </p>
+
+    </div>
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="alert
+                {% if message.tags == 'error' %}
+                    alert-error
+                {% else %}
+                    alert-success
+                {% endif %}
+            ">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <form method="POST" id="registerForm">
+
+        {% csrf_token %}
+
+
+        <!-- FULL NAME -->
+
+        <div class="form-group">
+
+            <label for="user_fullname">
+                Full Name
+            </label>
+
+            <input
+                type="text"
+                id="user_fullname"
+                name="user_fullname"
+                value="{{ user_fullname|default:'' }}"
+                placeholder="e.g. John Doe"
+                maxlength="50"
+                autocomplete="name"
+                required
+            >
+
+        </div>
+
+
+        <!-- MOBILE -->
+
+        <div class="form-group">
+
+            <label for="mobile">
+                Mobile Number
+            </label>
+
+            <div class="phone-wrapper">
+
+                <span class="phone-prefix">
+                    +91
+                </span>
+
+                <input
+                    type="tel"
+                    id="mobile"
+                    name="mobile"
+                    class="phone-input"
+                    value="{{ mobile|default:'' }}"
+                    placeholder="9876543210"
+                    maxlength="10"
+                    minlength="10"
+                    pattern="[0-9]{10}"
+                    inputmode="numeric"
+                    autocomplete="tel"
+                    title="Please enter a valid 10-digit mobile number"
+                    required
+                >
+
+            </div>
+
+            <span class="field-help">
+                Enter your 10-digit mobile number.
+            </span>
+
+        </div>
+
+
+        <!-- EMAIL -->
+
+        <div class="form-group">
+
+            <label for="email">
+                Email Address
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                value="{{ email|default:'' }}"
+                placeholder="name@example.com"
+                maxlength="100"
+                autocomplete="email"
+                required
+            >
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="form-group">
+
+            <label for="password">
+                Password
+            </label>
+
+            <div class="password-wrapper">
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Create a strong password"
+                    minlength="6"
+                    autocomplete="new-password"
+                    required
+                    style="padding-right: 65px;"
+                >
+
+                <button
+                    type="button"
+                    class="password-toggle"
+                    id="passwordToggle"
+                >
+                    Show
+                </button>
+
+            </div>
+
+            <div class="password-strength">
+
+                <div
+                    class="strength-bar"
+                    id="strengthBar"
+                ></div>
+
+            </div>
+
+            <span
+                class="strength-text"
+                id="strengthText"
+            >
+                Enter a password
+            </span>
+
+        </div>
+
+
+        <!-- REGISTER BUTTON -->
+
+        <button
+            type="submit"
+            class="btn"
+            id="registerButton"
+        >
+
+            <span class="button-text">
+                Create Account
+            </span>
+
+            <span class="spinner"></span>
+
+        </button>
+
+    </form>
+
+
+    <div class="footer-note">
+
+        Already registered?
+
+        <a href="{% url 'login' %}">
+            Log in here
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* =========================
+       MOBILE VALIDATION
+    ========================= */
+
+    const mobileInput =
+        document.getElementById("mobile");
+
+    mobileInput.addEventListener("input", function () {
+
+        this.value =
+            this.value
+                .replace(/[^0-9]/g, "")
+                .slice(0, 10);
+
+    });
+
+
+    /* =========================
+       PASSWORD SHOW / HIDE
+    ========================= */
+
+    const passwordInput =
+        document.getElementById("password");
+
+    const passwordToggle =
+        document.getElementById("passwordToggle");
+
+    passwordToggle.addEventListener("click", function () {
+
+        if (passwordInput.type === "password") {
+
+            passwordInput.type = "text";
+
+            this.textContent = "Hide";
+
+        } else {
+
+            passwordInput.type = "password";
+
+            this.textContent = "Show";
+
+        }
+
+    });
+
+
+    /* =========================
+       PASSWORD STRENGTH
+    ========================= */
+
+    const strengthBar =
+        document.getElementById("strengthBar");
+
+    const strengthText =
+        document.getElementById("strengthText");
+
+    passwordInput.addEventListener("input", function () {
+
+        const password = this.value;
+
+        let strength = 0;
+
+        if (password.length >= 6) {
+            strength++;
+        }
+
+        if (password.length >= 8) {
+            strength++;
+        }
+
+        if (/[A-Z]/.test(password)) {
+            strength++;
+        }
+
+        if (/[0-9]/.test(password)) {
+            strength++;
+        }
+
+        if (/[^A-Za-z0-9]/.test(password)) {
+            strength++;
+        }
+
+
+        if (!password) {
+
+            strengthBar.style.width = "0%";
+
+            strengthText.textContent =
+                "Enter a password";
+
+        } else if (strength <= 2) {
+
+            strengthBar.style.width = "35%";
+
+            strengthBar.style.background =
+                "#ef4444";
+
+            strengthText.textContent =
+                "Weak password";
+
+        } else if (strength <= 3) {
+
+            strengthBar.style.width = "65%";
+
+            strengthBar.style.background =
+                "#f59e0b";
+
+            strengthText.textContent =
+                "Medium password";
+
+        } else {
+
+            strengthBar.style.width = "100%";
+
+            strengthBar.style.background =
+                "#22c55e";
+
+            strengthText.textContent =
+                "Strong password";
+
+        }
+
+    });
+
+
+    /* =========================
+       FORM SUBMIT ANIMATION
+    ========================= */
+
+    const form =
+        document.getElementById("registerForm");
+
+    const registerButton =
+        document.getElementById("registerButton");
+
+    form.addEventListener("submit", function () {
+
+        if (!form.checkValidity()) {
+            return;
+        }
+
+        registerButton.classList.add("loading");
+
+    });
+
+</script>
+
+</body>
+</html>

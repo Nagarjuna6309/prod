@@ -6,11 +6,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Scheduled WhatsApp Messages</title>
+    <title>Scheduled WhatsApp Messages - Noti52me</title>
 
     <style>
+        :root {
+            --orange: #ff7a00;
+            --orange-dark: #e85d00;
+            --green: #16a34a;
+            --green-dark: #15803d;
+            --black: #09090b;
+            --dark: #18181b;
+            --gray: #71717a;
+            --light: #f4f4f5;
+            --white: #ffffff;
+            --red: #dc2626;
+        }
+
         * {
             box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -22,41 +39,146 @@
                 Roboto,
                 Arial,
                 sans-serif;
-            background: #f3f6f9;
-            color: #1f2937;
+
+            color: #18181b;
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(255, 122, 0, 0.12),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 90% 90%,
+                    rgba(22, 163, 74, 0.10),
+                    transparent 28%
+                ),
+                #f7f7f8;
+
+            min-height: 100vh;
         }
+
+        /* =====================================================
+           PAGE ANIMATION
+        ===================================================== */
 
         .page {
             min-height: 100vh;
             padding: 40px 20px;
+            animation: pageEnter 0.7s ease both;
+        }
+
+        @keyframes pageEnter {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1250px;
             margin: 0 auto;
         }
 
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
         .header {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
             gap: 20px;
-            margin-bottom: 25px;
+
+            margin-bottom: 28px;
+
+            animation: slideDown 0.7s ease both;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-icon {
+            width: 54px;
+            height: 54px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 16px;
+
+            color: white;
+
+            font-size: 25px;
+            font-weight: 900;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--orange),
+                    var(--orange-dark)
+                );
+
+            box-shadow:
+                0 10px 30px rgba(255, 122, 0, 0.28);
+
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
         }
 
         .header h1 {
-            margin: 0 0 8px;
-            color: #111827;
-            font-size: 30px;
-            font-weight: 700;
+            margin: 0 0 5px;
+
+            color: var(--black);
+
+            font-size: 29px;
+            font-weight: 800;
+
+            letter-spacing: -0.7px;
         }
 
         .header p {
             margin: 0;
-            color: #6b7280;
-            font-size: 15px;
+
+            color: var(--gray);
+
+            font-size: 14px;
         }
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
 
         .header-actions {
             display: flex;
@@ -68,64 +190,102 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 42px;
-            padding: 9px 16px;
+            gap: 7px;
+
+            min-height: 43px;
+
+            padding: 10px 17px;
+
             border: none;
-            border-radius: 9px;
+            border-radius: 11px;
+
             font-family: inherit;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
+
             text-decoration: none;
+
             cursor: pointer;
+
             transition:
-                background 0.15s ease,
-                transform 0.15s ease,
-                opacity 0.15s ease;
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
         }
 
         .btn:hover {
-            transform: translateY(-1px);
+            transform: translateY(-3px);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
         }
 
         .btn-primary {
-            background: #16a34a;
-            color: #ffffff;
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--orange),
+                    var(--orange-dark)
+                );
+
+            box-shadow:
+                0 7px 20px rgba(255, 122, 0, 0.22);
         }
 
         .btn-primary:hover {
-            background: #15803d;
+            box-shadow:
+                0 12px 28px rgba(255, 122, 0, 0.32);
         }
 
         .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
+            color: white;
+
+            background: var(--black);
+
+            box-shadow:
+                0 7px 20px rgba(0, 0, 0, 0.14);
         }
 
         .btn-secondary:hover {
-            background: #d1d5db;
-        }
-
-        .btn-danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .btn-danger:hover {
-            background: #fecaca;
+            background: #27272a;
         }
 
         .btn-small {
-            min-height: 34px;
+            min-height: 35px;
             padding: 7px 12px;
             font-size: 12px;
         }
 
+        /* =====================================================
+           ALERTS
+        ===================================================== */
+
         .alert {
-            padding: 14px 16px;
+            padding: 14px 17px;
+
             margin-bottom: 20px;
-            border-radius: 10px;
-            font-size: 14px;
+
+            border-radius: 12px;
+
+            font-size: 13px;
             line-height: 1.5;
+
+            animation: alertIn 0.5s ease both;
+        }
+
+        @keyframes alertIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .alert-success {
@@ -141,79 +301,212 @@
         }
 
         .alert-warning {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            color: #92400e;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
         }
+
+        /* =====================================================
+           SUMMARY CARDS
+        ===================================================== */
 
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
             gap: 15px;
+
             margin-bottom: 25px;
         }
 
         .summary-card {
-            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+
+            background: rgba(255, 255, 255, 0.92);
+
             padding: 20px;
-            border-radius: 13px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+
+            border-radius: 16px;
+
+            border: 1px solid #e4e4e7;
+
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, 0.055);
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+
+            animation: cardIn 0.6s ease both;
+        }
+
+        .summary-card:nth-child(1) {
+            animation-delay: 0.08s;
+        }
+
+        .summary-card:nth-child(2) {
+            animation-delay: 0.16s;
+        }
+
+        .summary-card:nth-child(3) {
+            animation-delay: 0.24s;
+        }
+
+        .summary-card:nth-child(4) {
+            animation-delay: 0.32s;
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .summary-card:hover {
+            transform: translateY(-6px);
+
+            box-shadow:
+                0 18px 40px rgba(0, 0, 0, 0.09);
+        }
+
+        .summary-card::after {
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            bottom: 0;
+
+            width: 100%;
+            height: 3px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--orange),
+                    var(--green)
+                );
+
+            transform: scaleX(0);
+
+            transform-origin: left;
+
+            transition: transform 0.3s ease;
+        }
+
+        .summary-card:hover::after {
+            transform: scaleX(1);
         }
 
         .summary-label {
             margin: 0 0 8px;
-            color: #6b7280;
-            font-size: 12px;
-            font-weight: 600;
+
+            color: var(--gray);
+
+            font-size: 11px;
+            font-weight: 800;
+
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+
+            letter-spacing: 0.8px;
         }
 
         .summary-value {
             margin: 0;
-            color: #111827;
-            font-size: 26px;
-            font-weight: 700;
+
+            color: var(--black);
+
+            font-size: 28px;
+            font-weight: 800;
         }
 
         .summary-card.scheduled .summary-value {
-            color: #2563eb;
+            color: var(--orange);
         }
 
         .summary-card.sent .summary-value {
-            color: #16a34a;
+            color: var(--green);
         }
 
         .summary-card.failed .summary-value {
-            color: #dc2626;
+            color: var(--red);
         }
 
+        /* =====================================================
+           TABLE CARD
+        ===================================================== */
+
         .table-card {
-            background: #ffffff;
-            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+
+            background: rgba(255, 255, 255, 0.96);
+
+            border: 1px solid #e4e4e7;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 12px 45px rgba(0, 0, 0, 0.065);
+
+            animation:
+                tableIn 0.75s ease 0.25s both;
+        }
+
+        @keyframes tableIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .table-header {
             display: flex;
+
             align-items: center;
             justify-content: space-between;
+
             gap: 15px;
+
             padding: 20px 24px;
-            border-bottom: 1px solid #e5e7eb;
+
+            border-bottom: 1px solid #e4e4e7;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(255, 122, 0, 0.045),
+                    rgba(22, 163, 74, 0.035)
+                );
         }
 
         .table-header h2 {
             margin: 0;
-            color: #111827;
+
+            color: var(--black);
+
             font-size: 18px;
+            font-weight: 800;
         }
 
         .message-count {
-            color: #6b7280;
-            font-size: 13px;
+            color: var(--gray);
+
+            font-size: 12px;
+            font-weight: 600;
         }
 
         .table-wrapper {
@@ -223,139 +516,208 @@
 
         table {
             width: 100%;
+
             min-width: 900px;
+
             border-collapse: collapse;
         }
 
         thead {
-            background: #f9fafb;
+            background: #fafafa;
         }
 
         th {
             padding: 13px 16px;
-            color: #6b7280;
-            font-size: 11px;
-            font-weight: 700;
+
+            color: #71717a;
+
+            font-size: 10px;
+            font-weight: 800;
+
             text-align: left;
+
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid #e5e7eb;
+
+            letter-spacing: 0.7px;
+
+            border-bottom: 1px solid #e4e4e7;
         }
 
         td {
             padding: 17px 16px;
-            color: #374151;
-            font-size: 14px;
+
+            color: #3f3f46;
+
+            font-size: 13px;
+
             vertical-align: top;
-            border-bottom: 1px solid #f0f1f3;
+
+            border-bottom: 1px solid #f0f0f1;
         }
 
         tbody tr {
-            transition: background 0.15s ease;
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
         }
 
         tbody tr:hover {
-            background: #fafafa;
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(255, 122, 0, 0.035),
+                    rgba(22, 163, 74, 0.025)
+                );
         }
 
         tbody tr:last-child td {
             border-bottom: none;
         }
 
+        /* =====================================================
+           MESSAGE
+        ===================================================== */
+
         .phone {
-            color: #111827;
-            font-weight: 600;
+            color: var(--black);
+
+            font-weight: 800;
+
             white-space: nowrap;
         }
 
         .message-id {
             margin-top: 4px;
-            color: #9ca3af;
-            font-size: 11px;
+
+            color: #a1a1aa;
+
+            font-size: 10px;
         }
 
         .message-preview {
             max-width: 330px;
-            color: #4b5563;
-            line-height: 1.5;
+
+            color: #52525b;
+
+            line-height: 1.55;
+
             white-space: pre-wrap;
+
             word-break: break-word;
         }
 
         .message-preview.collapsed {
             display: -webkit-box;
+
             -webkit-line-clamp: 3;
+
             -webkit-box-orient: vertical;
+
             overflow: hidden;
         }
 
         .show-message {
             display: inline-block;
+
             margin-top: 5px;
+
             padding: 0;
+
             border: none;
+
             background: transparent;
-            color: #15803d;
-            font-size: 12px;
-            font-weight: 600;
+
+            color: var(--orange);
+
+            font-size: 11px;
+
+            font-weight: 800;
+
             cursor: pointer;
         }
 
         .show-message:hover {
+            color: var(--green-dark);
+
             text-decoration: underline;
         }
 
+        /* =====================================================
+           DATE
+        ===================================================== */
+
         .date-main {
-            color: #111827;
-            font-weight: 600;
+            color: var(--black);
+
+            font-weight: 700;
+
             white-space: nowrap;
         }
 
         .date-time {
             margin-top: 4px;
-            color: #6b7280;
-            font-size: 12px;
+
+            color: var(--gray);
+
+            font-size: 11px;
+
             white-space: nowrap;
         }
 
         .sent-date {
             margin-top: 5px;
-            color: #16a34a;
-            font-size: 12px;
+
+            color: var(--green);
+
+            font-size: 11px;
         }
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
 
         .status-badge {
             display: inline-flex;
+
             align-items: center;
+
             gap: 7px;
+
             padding: 6px 10px;
+
             border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
             white-space: nowrap;
         }
 
         .status-dot {
             width: 7px;
             height: 7px;
+
             flex-shrink: 0;
+
             border-radius: 50%;
+
             background: currentColor;
         }
 
         .status-scheduled {
-            background: #eff6ff;
-            color: #2563eb;
+            background: #fff7ed;
+            color: var(--orange);
         }
 
         .status-processing {
-            background: #fef3c7;
-            color: #92400e;
+            background: #fefce8;
+            color: #a16207;
         }
 
         .status-sent {
             background: #dcfce7;
-            color: #166534;
+            color: var(--green-dark);
         }
 
         .status-failed {
@@ -363,31 +725,61 @@
             color: #991b1b;
         }
 
-        .status-cancelled {
-            background: #f3f4f6;
-            color: #4b5563;
+        .status-cancelled,
+        .status-unknown {
+            background: #f4f4f5;
+            color: #52525b;
         }
 
-        .status-unknown {
-            background: #f3f4f6;
-            color: #4b5563;
+        .status-processing .status-dot {
+            animation: pulseDot 1.2s infinite;
         }
+
+        @keyframes pulseDot {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.35;
+                transform: scale(1.5);
+            }
+        }
+
+        /* =====================================================
+           ERROR
+        ===================================================== */
 
         .error-message {
             max-width: 250px;
+
             margin-top: 7px;
+
             padding: 8px 10px;
+
             background: #fef2f2;
-            border-radius: 7px;
+
+            border-radius: 8px;
+
             color: #991b1b;
-            font-size: 11px;
+
+            font-size: 10px;
+
             line-height: 1.4;
+
             word-break: break-word;
         }
 
+        /* =====================================================
+           ACTIONS
+        ===================================================== */
+
         .actions {
             display: flex;
+
             align-items: center;
+
             gap: 7px;
         }
 
@@ -396,66 +788,135 @@
         }
 
         .send-button {
-            background: #16a34a;
-            color: #ffffff;
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--green),
+                    var(--green-dark)
+                );
+
+            box-shadow:
+                0 5px 15px rgba(22, 163, 74, 0.16);
         }
 
         .send-button:hover {
-            background: #15803d;
+            box-shadow:
+                0 8px 22px rgba(22, 163, 74, 0.25);
         }
 
         .send-button:disabled {
-            opacity: 0.6;
+            opacity: 0.55;
+
             cursor: not-allowed;
+
             transform: none;
         }
 
+        /* =====================================================
+           EMPTY
+        ===================================================== */
+
         .empty-state {
-            padding: 70px 25px;
+            padding: 75px 25px;
+
             text-align: center;
         }
 
         .empty-icon {
-            width: 70px;
-            height: 70px;
+            width: 78px;
+            height: 78px;
+
             display: flex;
             align-items: center;
             justify-content: center;
+
             margin: 0 auto 20px;
-            background: #f0fdf4;
+
             border-radius: 50%;
-            color: #16a34a;
+
+            color: white;
+
             font-size: 30px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--orange),
+                    var(--green)
+                );
+
+            box-shadow:
+                0 12px 30px rgba(255, 122, 0, 0.2);
+
+            animation:
+                emptyFloat 2.8s ease-in-out infinite;
+        }
+
+        @keyframes emptyFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-8px) rotate(3deg);
+            }
         }
 
         .empty-state h3 {
             margin: 0 0 8px;
-            color: #111827;
+
+            color: var(--black);
+
             font-size: 20px;
         }
 
         .empty-state p {
             max-width: 500px;
+
             margin: 0 auto 22px;
-            color: #6b7280;
+
+            color: var(--gray);
+
             line-height: 1.6;
         }
 
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
         .footer {
             display: flex;
+
             justify-content: space-between;
+
             gap: 15px;
+
             margin-top: 20px;
-            color: #9ca3af;
-            font-size: 12px;
+
+            color: #a1a1aa;
+
+            font-size: 11px;
         }
 
+        .footer strong {
+            color: var(--orange);
+        }
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
         @media (max-width: 800px) {
+
             .page {
                 padding: 25px 12px;
             }
 
             .header {
+                align-items: flex-start;
+
                 flex-direction: column;
             }
 
@@ -468,21 +929,23 @@
             }
 
             .summary-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .table-header {
-                padding: 17px;
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
             }
         }
 
         @media (max-width: 500px) {
+
             .header h1 {
-                font-size: 25px;
+                font-size: 24px;
+            }
+
+            .brand-icon {
+                width: 48px;
+                height: 48px;
             }
 
             .summary-grid {
-                grid-template-columns: 1fr 1fr;
                 gap: 10px;
             }
 
@@ -491,7 +954,7 @@
             }
 
             .summary-value {
-                font-size: 22px;
+                font-size: 23px;
             }
 
             .header-actions {
@@ -515,14 +978,28 @@
 
     <div class="container">
 
+        <!-- HEADER -->
+
         <div class="header">
 
-            <div>
-                <h1>Scheduled WhatsApp Messages</h1>
+            <div class="brand-area">
 
-                <p>
-                    View and manage your scheduled WhatsApp messages.
-                </p>
+                <div class="brand-icon">
+                    W
+                </div>
+
+                <div>
+
+                    <h1>
+                        Scheduled WhatsApp Messages
+                    </h1>
+
+                    <p>
+                        Manage your scheduled WhatsApp messages with Noti52me.
+                    </p>
+
+                </div>
+
             </div>
 
             <div class="header-actions">
@@ -531,19 +1008,22 @@
                     href="{% url 'whatsapp_messages:connect_whatsapp' %}"
                     class="btn btn-secondary"
                 >
-                    WhatsApp Connection
+                    🟢 WhatsApp Connection
                 </a>
 
                 <a
                     href="{% url 'whatsapp_messages:schedule_message' %}"
                     class="btn btn-primary"
                 >
-                    + Schedule Message
+                    ＋ Schedule Message
                 </a>
 
             </div>
 
         </div>
+
+
+        <!-- MESSAGES -->
 
         {% if messages %}
 
@@ -568,12 +1048,18 @@
 
         {% endif %}
 
+
         {% if scheduled_messages %}
+
+            <!-- SUMMARY -->
 
             <div class="summary-grid">
 
                 <div class="summary-card scheduled">
-                    <p class="summary-label">Scheduled</p>
+
+                    <p class="summary-label">
+                        Scheduled
+                    </p>
 
                     <p
                         id="scheduledCount"
@@ -581,10 +1067,15 @@
                     >
                         0
                     </p>
+
                 </div>
 
+
                 <div class="summary-card">
-                    <p class="summary-label">Processing</p>
+
+                    <p class="summary-label">
+                        Processing
+                    </p>
 
                     <p
                         id="processingCount"
@@ -592,10 +1083,15 @@
                     >
                         0
                     </p>
+
                 </div>
 
+
                 <div class="summary-card sent">
-                    <p class="summary-label">Sent</p>
+
+                    <p class="summary-label">
+                        Sent
+                    </p>
 
                     <p
                         id="sentCount"
@@ -603,10 +1099,15 @@
                     >
                         0
                     </p>
+
                 </div>
 
+
                 <div class="summary-card failed">
-                    <p class="summary-label">Failed</p>
+
+                    <p class="summary-label">
+                        Failed
+                    </p>
 
                     <p
                         id="failedCount"
@@ -614,44 +1115,78 @@
                     >
                         0
                     </p>
+
                 </div>
 
             </div>
+
+
+            <!-- TABLE -->
 
             <div class="table-card">
 
                 <div class="table-header">
 
-                    <h2>Messages</h2>
+                    <h2>
+                        WhatsApp Messages
+                    </h2>
 
                     <span class="message-count">
+
                         {{ scheduled_messages|length }}
+
                         message{{ scheduled_messages|length|pluralize }}
+
                     </span>
 
                 </div>
+
 
                 <div class="table-wrapper">
 
                     <table>
 
                         <thead>
+
                             <tr>
-                                <th>Recipient</th>
-                                <th>Message</th>
-                                <th>Scheduled For</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+
+                                <th>
+                                    Recipient
+                                </th>
+
+                                <th>
+                                    Message
+                                </th>
+
+                                <th>
+                                    Scheduled For
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
                             </tr>
+
                         </thead>
+
 
                         <tbody>
 
                         {% for item in scheduled_messages %}
 
-                            <tr data-status="{{ item.status|lower }}">
+                            <tr
+                                data-status="{{ item.status|lower }}"
+                            >
+
+                                <!-- RECIPIENT -->
 
                                 <td>
+
                                     <div class="phone">
                                         {{ item.phone_number }}
                                     </div>
@@ -659,7 +1194,11 @@
                                     <div class="message-id">
                                         ID #{{ item.id }}
                                     </div>
+
                                 </td>
+
+
+                                <!-- MESSAGE -->
 
                                 <td>
 
@@ -674,6 +1213,7 @@
                                     >
                                         {{ item.message }}
                                     </div>
+
 
                                     {% if item.message|length > 150 %}
 
@@ -690,6 +1230,9 @@
 
                                 </td>
 
+
+                                <!-- DATE -->
+
                                 <td>
 
                                     <div class="date-main">
@@ -700,62 +1243,104 @@
                                         {{ item.scheduled_at|date:"h:i A" }}
                                     </div>
 
+
                                     {% if item.sent_at %}
 
                                         <div class="sent-date">
-                                            Sent:
+
+                                            ✓ Sent:
                                             {{ item.sent_at|date:"M d, Y h:i A" }}
+
                                         </div>
 
                                     {% endif %}
 
                                 </td>
 
+
+                                <!-- STATUS -->
+
                                 <td>
 
                                     {% if item.status == "Scheduled" %}
 
-                                        <span class="status-badge status-scheduled">
+                                        <span
+                                            class="
+                                                status-badge
+                                                status-scheduled
+                                            "
+                                        >
                                             <span class="status-dot"></span>
                                             Scheduled
                                         </span>
 
+
                                     {% elif item.status == "Processing" %}
 
-                                        <span class="status-badge status-processing">
+                                        <span
+                                            class="
+                                                status-badge
+                                                status-processing
+                                            "
+                                        >
                                             <span class="status-dot"></span>
                                             Processing
                                         </span>
 
+
                                     {% elif item.status == "Sent" %}
 
-                                        <span class="status-badge status-sent">
+                                        <span
+                                            class="
+                                                status-badge
+                                                status-sent
+                                            "
+                                        >
                                             <span class="status-dot"></span>
                                             Sent
                                         </span>
 
+
                                     {% elif item.status == "Failed" %}
 
-                                        <span class="status-badge status-failed">
+                                        <span
+                                            class="
+                                                status-badge
+                                                status-failed
+                                            "
+                                        >
                                             <span class="status-dot"></span>
                                             Failed
                                         </span>
 
+
                                     {% elif item.status == "Cancelled" %}
 
-                                        <span class="status-badge status-cancelled">
+                                        <span
+                                            class="
+                                                status-badge
+                                                status-cancelled
+                                            "
+                                        >
                                             <span class="status-dot"></span>
                                             Cancelled
                                         </span>
 
+
                                     {% else %}
 
-                                        <span class="status-badge status-unknown">
+                                        <span
+                                            class="
+                                                status-badge
+                                                status-unknown
+                                            "
+                                        >
                                             <span class="status-dot"></span>
                                             {{ item.status }}
                                         </span>
 
                                     {% endif %}
+
 
                                     {% if item.error_log %}
 
@@ -769,6 +1354,9 @@
                                     {% endif %}
 
                                 </td>
+
+
+                                <!-- ACTIONS -->
 
                                 <td>
 
@@ -794,6 +1382,7 @@
 
                                             </form>
 
+
                                         {% elif item.status == "Failed" %}
 
                                             <form
@@ -814,37 +1403,40 @@
 
                                             </form>
 
+
                                         {% elif item.status == "Sent" %}
 
                                             <span
                                                 style="
                                                     color:#16a34a;
                                                     font-size:12px;
-                                                    font-weight:600;
+                                                    font-weight:700;
                                                 "
                                             >
-                                                Delivered
+                                                ✓ Delivered
                                             </span>
+
 
                                         {% elif item.status == "Processing" %}
 
                                             <span
                                                 style="
-                                                    color:#92400e;
+                                                    color:#a16207;
                                                     font-size:12px;
-                                                    font-weight:600;
+                                                    font-weight:700;
                                                 "
                                             >
                                                 Sending...
                                             </span>
 
+
                                         {% elif item.status == "Cancelled" %}
 
                                             <span
                                                 style="
-                                                    color:#6b7280;
+                                                    color:#71717a;
                                                     font-size:12px;
-                                                    font-weight:600;
+                                                    font-weight:700;
                                                 "
                                             >
                                                 Cancelled
@@ -868,7 +1460,10 @@
 
             </div>
 
+
         {% else %}
+
+            <!-- EMPTY -->
 
             <div class="table-card">
 
@@ -883,16 +1478,16 @@
                     </h3>
 
                     <p>
-                        You haven't scheduled any WhatsApp messages
-                        yet. Create a message and choose a future
-                        date and time to get started.
+                        You haven't scheduled any WhatsApp messages yet.
+                        Create a message and choose a future date and time
+                        to get started.
                     </p>
 
                     <a
                         href="{% url 'whatsapp_messages:schedule_message' %}"
                         class="btn btn-primary"
                     >
-                        Schedule Your First Message
+                        ＋ Schedule Your First Message
                     </a>
 
                 </div>
@@ -901,14 +1496,17 @@
 
         {% endif %}
 
+
+        <!-- FOOTER -->
+
         <div class="footer">
 
             <span>
-                WhatsApp Scheduler
+                <strong>Noti52me</strong> WhatsApp Scheduler
             </span>
 
             <span>
-                Messages are processed by Celery.
+                Automated processing powered by Celery.
             </span>
 
         </div>
@@ -917,13 +1515,19 @@
 
 </div>
 
+
 <script>
+
+    /* =========================================================
+       STATUS COUNTERS
+    ========================================================= */
 
     function updateStatusCounts() {
 
-        const rows = document.querySelectorAll(
-            "tbody tr[data-status]"
-        );
+        const rows =
+            document.querySelectorAll(
+                "tbody tr[data-status]"
+            );
 
         let scheduled = 0;
         let processing = 0;
@@ -932,9 +1536,11 @@
 
         rows.forEach(function(row) {
 
-            const status = (
-                row.dataset.status || ""
-            ).trim().toLowerCase();
+            const status =
+                (
+                    row.dataset.status || ""
+                ).trim().toLowerCase();
+
 
             if (status === "scheduled") {
                 scheduled++;
@@ -951,37 +1557,57 @@
             else if (status === "failed") {
                 failed++;
             }
+
         });
 
+
         const scheduledCount =
-            document.getElementById("scheduledCount");
+            document.getElementById(
+                "scheduledCount"
+            );
 
         const processingCount =
-            document.getElementById("processingCount");
+            document.getElementById(
+                "processingCount"
+            );
 
         const sentCount =
-            document.getElementById("sentCount");
+            document.getElementById(
+                "sentCount"
+            );
 
         const failedCount =
-            document.getElementById("failedCount");
+            document.getElementById(
+                "failedCount"
+            );
+
 
         if (scheduledCount) {
-            scheduledCount.textContent = scheduled;
+            scheduledCount.textContent =
+                scheduled;
         }
 
         if (processingCount) {
-            processingCount.textContent = processing;
+            processingCount.textContent =
+                processing;
         }
 
         if (sentCount) {
-            sentCount.textContent = sent;
+            sentCount.textContent =
+                sent;
         }
 
         if (failedCount) {
-            failedCount.textContent = failed;
+            failedCount.textContent =
+                failed;
         }
+
     }
 
+
+    /* =========================================================
+       SHOW MORE / LESS
+    ========================================================= */
 
     function toggleMessage(id) {
 
@@ -995,57 +1621,88 @@
                 `toggle-${id}`
             );
 
+
         if (!message || !button) {
             return;
         }
 
+
         if (
-            message.classList.contains("collapsed")
+            message.classList.contains(
+                "collapsed"
+            )
         ) {
 
-            message.classList.remove("collapsed");
+            message.classList.remove(
+                "collapsed"
+            );
 
-            button.textContent = "Show less";
+            button.textContent =
+                "Show less";
 
-        } else {
-
-            message.classList.add("collapsed");
-
-            button.textContent = "Show more";
         }
+
+        else {
+
+            message.classList.add(
+                "collapsed"
+            );
+
+            button.textContent =
+                "Show more";
+
+        }
+
     }
 
 
+    /* =========================================================
+       SEND CONFIRMATION
+    ========================================================= */
+
     function confirmSend(form) {
 
-        const confirmed = confirm(
-            "Send this WhatsApp message immediately?"
-        );
+        const confirmed =
+            confirm(
+                "Send this WhatsApp message immediately?"
+            );
+
 
         if (!confirmed) {
             return false;
         }
+
 
         const button =
             form.querySelector(
                 "button[type='submit']"
             );
 
+
         if (button) {
 
             button.disabled = true;
 
-            button.textContent = "Sending...";
+            button.textContent =
+                "Sending...";
+
         }
+
 
         return true;
     }
 
 
+    /* =========================================================
+       PAGE LOAD
+    ========================================================= */
+
     document.addEventListener(
         "DOMContentLoaded",
         function() {
+
             updateStatusCounts();
+
         }
     );
 
