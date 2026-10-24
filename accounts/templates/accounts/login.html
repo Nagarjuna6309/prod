@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Login | Noti5me</title>
+    <title>Login | Noti52me</title>
 
     <style>
         * {
@@ -15,46 +15,146 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+        html {
+            scroll-behavior: smooth;
         }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #050505;
+            color: #ffffff;
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 25px;
+
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background glow */
+
+        body::before {
+            content: "";
+            position: fixed;
+
+            width: 600px;
+            height: 600px;
+
+            top: -250px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            background: rgba(37, 211, 102, 0.10);
+
+            filter: blur(100px);
+
+            border-radius: 50%;
+
+            pointer-events: none;
+        }
+
+        /* Main wrapper */
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 440px;
+
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Brand */
+
+        .brand {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .brand a {
+            color: #ffffff;
+            text-decoration: none;
+
+            font-size: 30px;
+            font-weight: 800;
+
+            letter-spacing: -1.5px;
+        }
+
+        .brand span {
+            color: #25d366;
+        }
+
+        .brand p {
+            margin-top: 7px;
+
+            color: #777;
+
+            font-size: 13px;
+        }
+
+        /* Login card */
 
         .login-container {
             width: 100%;
-            max-width: 400px;
-            background: white;
-            padding: 35px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+            background: #0c0c0c;
+
+            border: 1px solid #202020;
+
+            border-radius: 18px;
+
+            padding: 38px;
+
+            box-shadow:
+                0 25px 80px rgba(0, 0, 0, 0.55);
         }
 
         h1 {
             text-align: center;
-            color: #333;
-            margin-bottom: 10px;
+
+            color: #ffffff;
+
+            font-size: 30px;
+
+            margin-bottom: 8px;
         }
 
         .subtitle {
             text-align: center;
-            color: #777;
-            margin-bottom: 25px;
-        }
 
-        .error {
-            background: #ffe5e5;
-            color: #d60000;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            text-align: center;
+            color: #777;
+
+            margin-bottom: 30px;
+
             font-size: 14px;
         }
+
+        /* Error */
+
+        .error {
+            background: rgba(255, 70, 70, 0.10);
+
+            border: 1px solid rgba(255, 70, 70, 0.25);
+
+            color: #ff7777;
+
+            padding: 12px;
+
+            border-radius: 9px;
+
+            margin-bottom: 22px;
+
+            text-align: center;
+
+            font-size: 13px;
+        }
+
+        /* Form */
 
         .form-group {
             margin-bottom: 20px;
@@ -62,153 +162,341 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 7px;
-            color: #333;
-            font-weight: bold;
+
+            margin-bottom: 8px;
+
+            color: #d6d6d6;
+
+            font-size: 13px;
+
+            font-weight: 600;
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+
+            padding: 13px 14px;
+
+            background: #111111;
+
+            color: #ffffff;
+
+            border: 1px solid #292929;
+
+            border-radius: 9px;
+
             font-size: 15px;
+
             outline: none;
+
+            transition: 0.25s;
+        }
+
+        .form-group input::placeholder {
+            color: #555;
         }
 
         .form-group input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+            border-color: #25d366;
+
+            box-shadow:
+                0 0 0 3px rgba(37, 211, 102, 0.10);
         }
+
+        /* Forgot password */
 
         .forgot-password {
             text-align: right;
-            margin-bottom: 20px;
+
+            margin-top: -5px;
+
+            margin-bottom: 22px;
         }
 
         .forgot-password a {
-            font-size: 14px;
-            color: #2563eb;
+            font-size: 13px;
+
+            color: #25d366;
+
             text-decoration: none;
-            font-weight: 500;
+
+            font-weight: 600;
         }
 
         .forgot-password a:hover {
             text-decoration: underline;
         }
 
+        /* Login button */
+
         .login-btn {
             width: 100%;
-            padding: 13px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+
+            padding: 14px;
+
+            background: #25d366;
+
+            color: #000000;
+
             border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
+
+            border-radius: 9px;
+
+            font-size: 15px;
+
+            font-weight: 800;
+
             cursor: pointer;
+
+            transition: 0.25s;
         }
 
         .login-btn:hover {
-            opacity: 0.9;
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 10px 30px rgba(37, 211, 102, 0.20);
         }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Divider */
+
+        .divider {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin: 25px 0;
+
+            color: #555;
+
+            font-size: 12px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+
+            flex: 1;
+
+            height: 1px;
+
+            background: #222;
+        }
+
+        /* Register */
 
         .register-link {
             text-align: center;
-            margin-top: 20px;
+
             color: #777;
+
+            font-size: 13px;
         }
 
         .register-link a {
-            color: #667eea;
+            color: #25d366;
+
             text-decoration: none;
-            font-weight: bold;
+
+            font-weight: 700;
         }
 
         .register-link a:hover {
             text-decoration: underline;
+        }
+
+        /* Footer */
+
+        .footer {
+            text-align: center;
+
+            margin-top: 25px;
+
+            color: #555;
+
+            font-size: 11px;
+        }
+
+        .footer strong {
+            color: #777;
+        }
+
+        /* Mobile */
+
+        @media (max-width: 500px) {
+
+            body {
+                padding: 18px;
+            }
+
+            .login-container {
+                padding: 28px 22px;
+            }
+
+            .brand a {
+                font-size: 27px;
+            }
+
+            h1 {
+                font-size: 27px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="login-container">
+    <div class="page-wrapper">
 
-        <h1>Login</h1>
+        <!-- Brand -->
 
-        <p class="subtitle">
-            Login to your account
-        </p>
+        <div class="brand">
 
-        {% if error %}
-            <div class="error">
-                {{ error }}
-            </div>
-        {% endif %}
-
-        <form method="POST" action="{% url 'login' %}">
-
-            {% csrf_token %}
-
-            <div class="form-group">
-
-                <label for="mobile">
-                    Mobile Number
-                </label>
-
-                <input
-                    type="text"
-                    id="mobile"
-                    name="mobile"
-                    placeholder="Enter your mobile number"
-                    value="{{ request.POST.mobile|default:'' }}"
-                    maxlength="10"
-                    minlength="10"
-                    pattern="[0-9]{10}"
-                    inputmode="numeric"
-                    autocomplete="tel"
-                    required
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="password">
-                    Password
-                </label>
-
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    autocomplete="current-password"
-                    required
-                >
-
-            </div>
-
-            <div class="forgot-password">
-                <a href="{% url 'forgot_password_email_request' %}">
-                    Forgot Password?
-                </a>
-            </div>
-
-            <button type="submit" class="login-btn">
-                Login
-            </button>
-
-        </form>
-
-        <div class="register-link">
-
-            Don't have an account?
-
-            <a href="{% url 'register' %}">
-                Register
+            <a href="{% url 'home' %}">
+                Noti<span>52</span>me
             </a>
+
+            <p>
+                Schedule. Remember. Connect.
+            </p>
+
+        </div>
+
+
+        <!-- Login Card -->
+
+        <div class="login-container">
+
+            <h1>
+                Welcome back
+            </h1>
+
+            <p class="subtitle">
+                Login to your Noti52me account
+            </p>
+
+
+            <!-- Error -->
+
+            {% if error %}
+
+                <div class="error">
+                    {{ error }}
+                </div>
+
+            {% endif %}
+
+
+            <!-- Login Form -->
+
+            <form method="POST" action="{% url 'login' %}">
+
+                {% csrf_token %}
+
+
+                <!-- Mobile -->
+
+                <div class="form-group">
+
+                    <label for="mobile">
+                        Mobile Number
+                    </label>
+
+                    <input
+                        type="text"
+                        id="mobile"
+                        name="mobile"
+                        placeholder="Enter your mobile number"
+                        value="{{ request.POST.mobile|default:'' }}"
+                        maxlength="10"
+                        minlength="10"
+                        pattern="[0-9]{10}"
+                        inputmode="numeric"
+                        autocomplete="tel"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Password -->
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Forgot Password -->
+
+                <div class="forgot-password">
+
+                    <a href="{% url 'forgot_password_email_request' %}">
+                        Forgot Password?
+                    </a>
+
+                </div>
+
+
+                <!-- Login -->
+
+                <button
+                    type="submit"
+                    class="login-btn"
+                >
+                    Login
+                </button>
+
+            </form>
+
+
+            <!-- Divider -->
+
+            <div class="divider">
+                OR
+            </div>
+
+
+            <!-- Register -->
+
+            <div class="register-link">
+
+                Don't have an account?
+
+                <a href="{% url 'register' %}">
+                    Create an account
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- Footer -->
+
+        <div class="footer">
+
+            © 2026
+            <strong>Noti52me</strong>
+            · Developed by V Nagrjuna
 
         </div>
 

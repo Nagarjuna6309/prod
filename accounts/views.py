@@ -148,7 +148,11 @@ class LoginAPIView(APIView):
         
 #web 
 '''
+def landing_page(request):
+    if request.user.is_authenticated:
+        return redirect("home")
 
+    return render(request, "accounts/landing.html")
 
 
 
@@ -239,9 +243,6 @@ def _send_registration_otp(request, pending):
 
 
 def register_page(request):
-    if request.user.is_authenticated:
-        return redirect("dashboard")
-
     if request.method == "POST":
         user_fullname = request.POST.get("user_fullname", "").strip()
         mobile = request.POST.get("mobile", "").strip()
@@ -254,35 +255,91 @@ def register_page(request):
             "email": email,
         }
 
+        # Validate name
         if not user_fullname or len(user_fullname) > 25:
-            messages.error(request, "Enter a name of 1 to 25 characters.")
-            return render(request, "accounts/register.html", context)
+            messages.error(
+                request,
+                "Enter a name of 1 to 25 characters."
+            )
+            return render(
+                request,
+                "accounts/register.html",
+                context
+            )
 
+        # Validate mobile number
         if not mobile.isdigit() or len(mobile) != 10:
-            messages.error(request, "Enter a valid 10-digit mobile number.")
-            return render(request, "accounts/register.html", context)
+            messages.error(
+                request,
+                "Enter a valid 10-digit mobile number."
+            )
+            return render(
+                request,
+                "accounts/register.html",
+                context
+            )
 
+        # Validate email
         try:
             validate_email(email)
         except ValidationError:
-            messages.error(request, "Enter a valid email address.")
-            return render(request, "accounts/register.html", context)
+            messages.error(
+                request,
+                "Enter a valid email address."
+            )
+            return render(
+                request,
+                "accounts/register.html",
+                context
+            )
 
+        # Validate email length
         if len(email) > 30:
-            messages.error(request, "Email address must be 30 characters or fewer.")
-            return render(request, "accounts/register.html", context)
+            messages.error(
+                request,
+                "Email address must be 30 characters or fewer."
+            )
+            return render(
+                request,
+                "accounts/register.html",
+                context
+            )
 
+        # Validate password
         if len(password) < 6:
-            messages.error(request, "Password must contain at least 6 characters.")
-            return render(request, "accounts/register.html", context)
+            messages.error(
+                request,
+                "Password must contain at least 6 characters."
+            )
+            return render(
+                request,
+                "accounts/register.html",
+                context
+            )
 
+        # Check duplicate mobile
         if User.objects.filter(mobile=mobile).exists():
-            messages.error(request, "This mobile number is already registered.")
-            return render(request, "accounts/register.html", context)
+            messages.error(
+                request,
+                "This mobile number is already registered."
+            )
+            return render(
+                request,
+                "accounts/register.html",
+                context
+            )
 
+        # Check duplicate email
         if User.objects.filter(mail__iexact=email).exists():
-            messages.error(request, "This email is already registered.")
-            return render(request, "accounts/register.html", context)
+            messages.error(
+                request,
+                "This email is already registered."
+            )
+            return render(
+                request,
+                "accounts/register.html",
+                context
+            )
 
         # Store a password hash, not the plain-text password.
         pending = {
@@ -292,17 +349,27 @@ def register_page(request):
             "password_hash": make_password(password),
         }
 
+        # Remove any previous registration OTP session.
         request.session.pop(REGISTRATION_OTP_KEY, None)
 
+        # Send registration OTP.
         if not _send_registration_otp(request, pending):
             messages.error(
                 request,
                 "Unable to send the verification email. "
                 "Check your Gmail SMTP settings and try again.",
             )
-            return render(request, "accounts/register.html", context)
+            return render(
+                request,
+                "accounts/register.html",
+                context
+            )
 
-        messages.success(request, "A verification code has been sent to your email.")
+        messages.success(
+            request,
+            "A verification code has been sent to your email."
+        )
+
         return redirect("otp")
 
     return render(request, "accounts/register.html")
@@ -531,27 +598,44 @@ User = get_user_model()
 
 def forgot_password_email_request(request):
     if request.method == 'POST':
-        email = request.POST.get('email', '').strip().lower()
+        email = request.POST.get('email', '').strip()
 
-        user = User.objects.filter(email__iexact=email).first()
-        if not user:
-            messages.error(request, 'No registered account found with that email address.')
+        # The custom User model stores email addresses in `mail`.
+        user = User.objects.filter(mail__iexact=email).first()
+
+        if not user or not user.mail:
+            messages.error(
+                request,
+                'No registered account found with that email address.'
+            )
             return render(request, 'accounts/email_otp_request.html')
 
-        # Generate OTP
+        # Generate an OTP for this user.
         otp_obj = PasswordResetOTP.generate_otp(user)
 
-        # Dispatch via Email
-        ok, res = send_otp_via_email(user.email, otp_obj.otp)
+        # Send the OTP to the registered email address.
+        ok, result = send_otp_via_email(user.mail, otp_obj.otp)
 
+        if not ok:
+            # Invalidate the OTP if delivery fails.
+            otp_obj.is_used = True
+            otp_obj.save(update_fields=['is_used'])
+
+            messages.error(
+                request,
+                'We could not send the verification email. '
+                'Please check the email configuration and try again.'
+            )
+            return render(request, 'accounts/email_otp_request.html')
+
+        # Save reset session only after successful email delivery.
         request.session['reset_user_id'] = user.id
-        request.session['reset_email'] = user.email
+        request.session['reset_email'] = user.mail
 
-        if ok:
-            messages.success(request, f'A verification code has been sent to {user.email}')
-        else:
-            messages.warning(request, f'OTP generated. (Check terminal/console if testing locally)')
-
+        messages.success(
+            request,
+            f'A verification code has been sent to {user.mail}.'
+        )
         return redirect('forgot_password_email_verify')
 
     return render(request, 'accounts/email_otp_request.html')

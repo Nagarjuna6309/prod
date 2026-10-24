@@ -40,32 +40,39 @@ from django.conf import settings
     print(f'[SMS Delivery Error] {exc}')
     print(f'[DEV BACKUP] OTP for {target} is: {otp_code}')
     return False, str(exc)'''
-
-
-from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import send_mail
+
 
 def send_otp_via_email(user_email, otp_code):
+    if not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
+        return False, "Email SMTP credentials are not configured."
+
     subject = "Noti5me - Password Reset Verification Code"
     message = (
-        f"Hello,\n\n"
-        f"You requested a password reset for your Noti5me account.\n\n"
+        "Hello,\n\n"
+        "You requested a password reset for your Noti5me account.\n\n"
         f"Your 6-digit OTP code is: {otp_code}\n\n"
-        f"This code will expire in 10 minutes. If you did not make this request, please ignore this email.\n\n"
-        f"— Team Noti5me"
+        "This code expires in 10 minutes. "
+        "If you did not request this, please ignore this email.\n\n"
+        "-- Team Noti5me"
     )
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@noti5me.com')
 
     try:
-        send_mail(
+        sent_count = send_mail(
             subject=subject,
             message=message,
-            from_email=from_email,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user_email],
             fail_silently=False,
         )
-        return True, "Email sent successfully."
+
+        if sent_count == 1:
+            return True, "Email sent successfully."
+
+        return False, "The email backend did not confirm delivery."
+
     except Exception as exc:
-        print(f"[EMAIL ERROR] Failed to send to {user_email}: {exc}")
-        print(f"[CONSOLE FALLBACK OTP] Code is: {otp_code}")
-        return False, str(exc)
+        # Log the error, but never log the OTP itself.
+        print(f"[EMAIL ERROR] Could not send password-reset email: {exc}")
+        return False, "Email sending failed."

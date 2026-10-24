@@ -1,38 +1,27 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Create Account - Noti5me</title>
+    <title>Create Account | Noti52me</title>
 
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #8b5cf6;
-            --text: #0f172a;
-            --muted: #64748b;
-            --border: #e2e8f0;
-            --danger: #dc2626;
-            --success: #16a34a;
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
-                Arial,
-                sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #050505;
+            color: #ffffff;
 
             min-height: 100vh;
 
@@ -40,192 +29,142 @@
             align-items: center;
             justify-content: center;
 
-            padding: 30px 16px;
+            padding: 25px;
 
-            color: var(--text);
-
+            position: relative;
             overflow-x: hidden;
-
-            background:
-                radial-gradient(
-                    circle at 10% 20%,
-                    rgba(99, 102, 241, 0.25),
-                    transparent 35%
-                ),
-                radial-gradient(
-                    circle at 90% 80%,
-                    rgba(139, 92, 246, 0.25),
-                    transparent 35%
-                ),
-                linear-gradient(
-                    135deg,
-                    #eef2ff,
-                    #f8fafc,
-                    #f5f3ff
-                );
         }
 
         /* =========================
-           ANIMATED BACKGROUND
-        ========================= */
+           BACKGROUND
+        ========================== */
 
-        .background {
+        body::before {
+            content: "";
+
             position: fixed;
-            inset: 0;
 
-            overflow: hidden;
+            width: 650px;
+            height: 650px;
 
-            pointer-events: none;
+            top: -300px;
+            left: 50%;
 
-            z-index: 0;
-        }
+            transform: translateX(-50%);
 
-        .orb {
-            position: absolute;
+            background: rgba(37, 211, 102, 0.10);
+
+            filter: blur(110px);
 
             border-radius: 50%;
 
-            filter: blur(2px);
-
-            opacity: 0.35;
-
-            animation: float 12s ease-in-out infinite;
+            pointer-events: none;
         }
 
-        .orb-one {
-            width: 220px;
-            height: 220px;
+        body::after {
+            content: "";
 
-            background: #818cf8;
+            position: fixed;
 
-            top: -70px;
-            left: -60px;
+            width: 400px;
+            height: 400px;
+
+            bottom: -220px;
+            right: -150px;
+
+            background: rgba(37, 211, 102, 0.06);
+
+            filter: blur(90px);
+
+            border-radius: 50%;
+
+            pointer-events: none;
         }
 
-        .orb-two {
-            width: 180px;
-            height: 180px;
+        /* =========================
+           WRAPPER
+        ========================== */
 
-            background: #a78bfa;
+        .page-wrapper {
+            width: 100%;
+            max-width: 460px;
 
-            right: -50px;
-            top: 20%;
+            position: relative;
 
-            animation-delay: -4s;
+            z-index: 2;
         }
 
-        .orb-three {
-            width: 140px;
-            height: 140px;
+        /* =========================
+           BRAND
+        ========================== */
 
-            background: #c4b5fd;
+        .brand {
+            text-align: center;
 
-            bottom: -40px;
-            left: 20%;
-
-            animation-delay: -8s;
+            margin-bottom: 24px;
         }
 
-        @keyframes float {
-            0%,
-            100% {
-                transform: translate(0, 0) scale(1);
-            }
+        .brand a {
+            color: #ffffff;
 
-            50% {
-                transform: translate(25px, -35px) scale(1.08);
-            }
+            text-decoration: none;
+
+            font-size: 30px;
+
+            font-weight: 800;
+
+            letter-spacing: -1.5px;
+        }
+
+        .brand span {
+            color: #25d366;
+        }
+
+        .brand p {
+            color: #777;
+
+            margin-top: 7px;
+
+            font-size: 13px;
         }
 
         /* =========================
            CARD
-        ========================= */
+        ========================== */
 
-        .card {
-            position: relative;
-
-            z-index: 2;
-
+        .register-container {
             width: 100%;
-            max-width: 450px;
 
-            padding: 38px 34px;
+            background: #0c0c0c;
 
-            background: rgba(255, 255, 255, 0.88);
-
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-
-            border: 1px solid rgba(255, 255, 255, 0.8);
-
-            border-radius: 24px;
-
-            box-shadow:
-                0 25px 70px rgba(15, 23, 42, 0.12),
-                0 8px 25px rgba(99, 102, 241, 0.08);
-
-            animation: cardAppear 0.8s ease forwards;
-
-            transform: translateY(25px);
-
-            opacity: 0;
-        }
-
-        @keyframes cardAppear {
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* =========================
-           LOGO
-        ========================= */
-
-        .logo {
-            width: 58px;
-            height: 58px;
-
-            margin: 0 auto 18px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: 1px solid #202020;
 
             border-radius: 18px;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--primary),
-                    var(--secondary)
-                );
-
-            color: white;
-
-            font-size: 24px;
-            font-weight: 800;
+            padding: 38px;
 
             box-shadow:
-                0 10px 25px rgba(99, 102, 241, 0.3);
+                0 25px 80px rgba(0, 0, 0, 0.55);
 
-            animation: logoPulse 3s ease-in-out infinite;
+            animation: cardAppear 0.5s ease;
         }
 
-        @keyframes logoPulse {
-            0%,
-            100% {
-                transform: scale(1);
+        @keyframes cardAppear {
+
+            from {
+                opacity: 0;
+                transform: translateY(15px);
             }
 
-            50% {
-                transform: scale(1.05);
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
         /* =========================
            HEADER
-        ========================= */
+        ========================== */
 
         .header {
             text-align: center;
@@ -234,68 +173,58 @@
         }
 
         .header h1 {
-            font-size: 1.65rem;
+            color: #ffffff;
+
+            font-size: 29px;
 
             font-weight: 800;
 
-            letter-spacing: -0.5px;
+            letter-spacing: -0.8px;
 
-            margin-bottom: 7px;
+            margin-bottom: 8px;
         }
 
         .header p {
-            color: var(--muted);
+            color: #777;
 
-            font-size: 0.92rem;
+            font-size: 14px;
         }
 
         /* =========================
            MESSAGES
-        ========================= */
+        ========================== */
 
         .alert {
             padding: 12px 14px;
 
-            border-radius: 10px;
+            border-radius: 9px;
 
-            margin-bottom: 18px;
+            margin-bottom: 20px;
 
-            font-size: 0.85rem;
+            font-size: 13px;
 
-            animation: alertIn 0.4s ease;
-        }
-
-        @keyframes alertIn {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            line-height: 1.5;
         }
 
         .alert-error {
-            background: #fef2f2;
+            background: rgba(255, 70, 70, 0.10);
 
-            color: #991b1b;
+            border: 1px solid rgba(255, 70, 70, 0.25);
 
-            border: 1px solid #fecaca;
+            color: #ff7777;
         }
 
         .alert-success {
-            background: #f0fdf4;
+            background: rgba(37, 211, 102, 0.08);
 
-            color: #166534;
+            border: 1px solid rgba(37, 211, 102, 0.22);
 
-            border: 1px solid #bbf7d0;
+            color: #25d366;
         }
 
         /* =========================
            FORM
-        ========================= */
+        ========================== */
 
         .form-group {
             margin-bottom: 19px;
@@ -304,17 +233,13 @@
         .form-group label {
             display: block;
 
-            margin-bottom: 7px;
+            margin-bottom: 8px;
 
-            font-size: 0.86rem;
+            color: #d5d5d5;
 
-            font-weight: 650;
+            font-size: 13px;
 
-            color: #334155;
-        }
-
-        .input-wrapper {
-            position: relative;
+            font-weight: 600;
         }
 
         .form-group input {
@@ -324,47 +249,44 @@
 
             padding: 0 14px;
 
-            border: 1.5px solid var(--border);
+            border: 1px solid #292929;
 
-            border-radius: 11px;
+            border-radius: 9px;
 
             outline: none;
 
-            background: rgba(255, 255, 255, 0.85);
+            background: #111111;
 
-            color: var(--text);
+            color: #ffffff;
 
-            font-size: 0.95rem;
+            font-size: 15px;
 
             transition:
                 border-color 0.2s ease,
                 box-shadow 0.2s ease,
-                transform 0.2s ease,
                 background 0.2s ease;
         }
 
         .form-group input:hover {
-            border-color: #c7d2fe;
+            border-color: #3a3a3a;
         }
 
         .form-group input:focus {
-            border-color: var(--primary);
+            border-color: #25d366;
 
-            background: white;
+            background: #101010;
 
             box-shadow:
-                0 0 0 4px rgba(99, 102, 241, 0.12);
-
-            transform: translateY(-1px);
+                0 0 0 3px rgba(37, 211, 102, 0.10);
         }
 
         .form-group input::placeholder {
-            color: #94a3b8;
+            color: #555;
         }
 
         /* =========================
            PHONE
-        ========================= */
+        ========================== */
 
         .phone-wrapper {
             position: relative;
@@ -378,9 +300,9 @@
 
             transform: translateY(-50%);
 
-            color: #64748b;
+            color: #999;
 
-            font-size: 0.9rem;
+            font-size: 14px;
 
             font-weight: 700;
 
@@ -391,31 +313,36 @@
 
         .phone-input {
             padding-left: 50px !important;
+
             letter-spacing: 0.04em;
         }
 
         .field-help {
             display: block;
 
-            margin-top: 5px;
+            margin-top: 6px;
 
-            font-size: 0.72rem;
+            color: #555;
 
-            color: #94a3b8;
+            font-size: 11px;
         }
 
         /* =========================
            PASSWORD
-        ========================= */
+        ========================== */
 
         .password-wrapper {
             position: relative;
         }
 
+        .password-wrapper input {
+            padding-right: 65px;
+        }
+
         .password-toggle {
             position: absolute;
 
-            right: 13px;
+            right: 12px;
             top: 50%;
 
             transform: translateY(-50%);
@@ -424,20 +351,24 @@
 
             background: transparent;
 
-            color: #64748b;
+            color: #777;
 
-            font-size: 0.78rem;
+            font-size: 12px;
 
-            font-weight: 600;
+            font-weight: 700;
 
             cursor: pointer;
 
-            padding: 4px;
+            padding: 5px;
         }
 
         .password-toggle:hover {
-            color: var(--primary);
+            color: #25d366;
         }
+
+        /* =========================
+           PASSWORD STRENGTH
+        ========================== */
 
         .password-strength {
             height: 4px;
@@ -446,7 +377,7 @@
 
             border-radius: 10px;
 
-            background: #e2e8f0;
+            background: #222;
 
             overflow: hidden;
         }
@@ -458,6 +389,8 @@
 
             border-radius: inherit;
 
+            background: #25d366;
+
             transition:
                 width 0.3s ease,
                 background 0.3s ease;
@@ -466,16 +399,16 @@
         .strength-text {
             display: block;
 
-            margin-top: 5px;
+            margin-top: 6px;
 
-            font-size: 0.72rem;
+            color: #666;
 
-            color: var(--muted);
+            font-size: 11px;
         }
 
         /* =========================
            BUTTON
-        ========================= */
+        ========================== */
 
         .btn {
             position: relative;
@@ -488,31 +421,24 @@
 
             border: none;
 
-            border-radius: 12px;
+            border-radius: 9px;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--primary),
-                    var(--secondary)
-                );
+            background: #25d366;
 
-            color: white;
+            color: #000000;
 
-            font-size: 0.96rem;
+            font-size: 15px;
 
-            font-weight: 700;
+            font-weight: 800;
 
             cursor: pointer;
 
             overflow: hidden;
 
-            box-shadow:
-                0 10px 25px rgba(99, 102, 241, 0.25);
-
             transition:
                 transform 0.2s ease,
-                box-shadow 0.2s ease;
+                box-shadow 0.2s ease,
+                opacity 0.2s ease;
         }
 
         .btn::before {
@@ -529,7 +455,7 @@
             background: linear-gradient(
                 90deg,
                 transparent,
-                rgba(255,255,255,0.35),
+                rgba(255, 255, 255, 0.35),
                 transparent
             );
 
@@ -542,7 +468,7 @@
             transform: translateY(-2px);
 
             box-shadow:
-                0 14px 30px rgba(99, 102, 241, 0.35);
+                0 12px 30px rgba(37, 211, 102, 0.20);
         }
 
         .btn:hover::before {
@@ -556,7 +482,7 @@
         .btn.loading {
             pointer-events: none;
 
-            opacity: 0.75;
+            opacity: 0.70;
         }
 
         .spinner {
@@ -565,9 +491,9 @@
             width: 18px;
             height: 18px;
 
-            border: 2px solid rgba(255,255,255,0.4);
+            border: 2px solid rgba(0, 0, 0, 0.25);
 
-            border-top-color: white;
+            border-top-color: #000;
 
             border-radius: 50%;
 
@@ -585,68 +511,79 @@
         }
 
         @keyframes spin {
+
             to {
                 transform: rotate(360deg);
             }
+
         }
 
         /* =========================
            FOOTER
-        ========================= */
+        ========================== */
 
         .footer-note {
             text-align: center;
 
             margin-top: 23px;
 
-            font-size: 0.87rem;
+            color: #777;
 
-            color: var(--muted);
+            font-size: 13px;
         }
 
         .footer-note a {
-            color: var(--primary);
+            color: #25d366;
 
             font-weight: 700;
 
             text-decoration: none;
-
-            transition: color 0.2s ease;
         }
 
         .footer-note a:hover {
-            color: var(--primary-dark);
-
             text-decoration: underline;
+        }
+
+        .copyright {
+            text-align: center;
+
+            margin-top: 22px;
+
+            color: #4f4f4f;
+
+            font-size: 11px;
+        }
+
+        .copyright strong {
+            color: #666;
         }
 
         /* =========================
            MOBILE
-        ========================= */
+        ========================== */
 
-        @media (max-width: 480px) {
+        @media (max-width: 500px) {
 
             body {
-                padding: 15px;
+                padding: 18px;
             }
 
-            .card {
-                padding: 30px 22px;
+            .register-container {
+                padding: 28px 22px;
 
-                border-radius: 20px;
+                border-radius: 16px;
+            }
+
+            .brand a {
+                font-size: 27px;
             }
 
             .header h1 {
-                font-size: 1.45rem;
+                font-size: 26px;
             }
 
-            .logo {
-                width: 52px;
-                height: 52px;
-
-                border-radius: 16px;
-
-                font-size: 21px;
+            .form-group input {
+                height: 47px;
             }
         }
     </style>
@@ -654,365 +591,436 @@
 
 <body>
 
-<div class="background">
-    <div class="orb orb-one"></div>
-    <div class="orb orb-two"></div>
-    <div class="orb orb-three"></div>
-</div>
+    <div class="page-wrapper">
 
-<div class="card">
+        <!-- =========================
+             BRAND
+        ========================== -->
 
-    <div class="logo">
-        N
-    </div>
+        <div class="brand">
 
-    <div class="header">
+            <a href="{% url 'home' %}">
+                Noti<span>52</span>me
+            </a>
 
-        <h1>Create Account</h1>
-
-        <p>
-            Set up your Noti5me notification profile
-        </p>
-
-    </div>
-
-    {% if messages %}
-
-        {% for message in messages %}
-
-            <div class="alert
-                {% if message.tags == 'error' %}
-                    alert-error
-                {% else %}
-                    alert-success
-                {% endif %}
-            ">
-                {{ message }}
-            </div>
-
-        {% endfor %}
-
-    {% endif %}
-
-
-    <form method="POST" id="registerForm">
-
-        {% csrf_token %}
-
-
-        <!-- FULL NAME -->
-
-        <div class="form-group">
-
-            <label for="user_fullname">
-                Full Name
-            </label>
-
-            <input
-                type="text"
-                id="user_fullname"
-                name="user_fullname"
-                value="{{ user_fullname|default:'' }}"
-                placeholder="e.g. John Doe"
-                maxlength="50"
-                autocomplete="name"
-                required
-            >
+            <p>
+                Schedule. Remember. Connect.
+            </p>
 
         </div>
 
 
-        <!-- MOBILE -->
+        <!-- =========================
+             REGISTER CARD
+        ========================== -->
 
-        <div class="form-group">
+        <div class="register-container">
 
-            <label for="mobile">
-                Mobile Number
-            </label>
+            <div class="header">
 
-            <div class="phone-wrapper">
+                <h1>
+                    Create Account
+                </h1>
 
-                <span class="phone-prefix">
-                    +91
-                </span>
-
-                <input
-                    type="tel"
-                    id="mobile"
-                    name="mobile"
-                    class="phone-input"
-                    value="{{ mobile|default:'' }}"
-                    placeholder="9876543210"
-                    maxlength="10"
-                    minlength="10"
-                    pattern="[0-9]{10}"
-                    inputmode="numeric"
-                    autocomplete="tel"
-                    title="Please enter a valid 10-digit mobile number"
-                    required
-                >
+                <p>
+                    Start scheduling your important moments
+                </p>
 
             </div>
 
-            <span class="field-help">
-                Enter your 10-digit mobile number.
-            </span>
 
-        </div>
+            <!-- =========================
+                 DJANGO MESSAGES
+            ========================== -->
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="alert
+                        {% if message.tags == 'error' %}
+                            alert-error
+                        {% else %}
+                            alert-success
+                        {% endif %}
+                    ">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
 
 
-        <!-- EMAIL -->
+            <!-- =========================
+                 REGISTER FORM
+            ========================== -->
 
-        <div class="form-group">
-
-            <label for="email">
-                Email Address
-            </label>
-
-            <input
-                type="email"
-                id="email"
-                name="email"
-                value="{{ email|default:'' }}"
-                placeholder="name@example.com"
-                maxlength="100"
-                autocomplete="email"
-                required
+            <form
+                method="POST"
+                id="registerForm"
             >
 
-        </div>
+                {% csrf_token %}
 
 
-        <!-- PASSWORD -->
+                <!-- FULL NAME -->
 
-        <div class="form-group">
+                <div class="form-group">
 
-            <label for="password">
-                Password
-            </label>
+                    <label for="user_fullname">
+                        Full Name
+                    </label>
 
-            <div class="password-wrapper">
+                    <input
+                        type="text"
+                        id="user_fullname"
+                        name="user_fullname"
+                        value="{{ user_fullname|default:'' }}"
+                        placeholder="Enter your full name"
+                        maxlength="50"
+                        autocomplete="name"
+                        required
+                    >
 
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Create a strong password"
-                    minlength="6"
-                    autocomplete="new-password"
-                    required
-                    style="padding-right: 65px;"
-                >
+                </div>
+
+
+                <!-- MOBILE -->
+
+                <div class="form-group">
+
+                    <label for="mobile">
+                        Mobile Number
+                    </label>
+
+                    <div class="phone-wrapper">
+
+                        <span class="phone-prefix">
+                            +91
+                        </span>
+
+                        <input
+                            type="tel"
+                            id="mobile"
+                            name="mobile"
+                            class="phone-input"
+                            value="{{ mobile|default:'' }}"
+                            placeholder="9876543210"
+                            maxlength="10"
+                            minlength="10"
+                            pattern="[0-9]{10}"
+                            inputmode="numeric"
+                            autocomplete="tel"
+                            title="Please enter a valid 10-digit mobile number"
+                            required
+                        >
+
+                    </div>
+
+                    <span class="field-help">
+                        Enter your 10-digit mobile number.
+                    </span>
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value="{{ email|default:'' }}"
+                        placeholder="name@example.com"
+                        maxlength="100"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="password-wrapper">
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a strong password"
+                            minlength="6"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="passwordToggle"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+
+                    <!-- PASSWORD STRENGTH -->
+
+                    <div class="password-strength">
+
+                        <div
+                            class="strength-bar"
+                            id="strengthBar"
+                        ></div>
+
+                    </div>
+
+                    <span
+                        class="strength-text"
+                        id="strengthText"
+                    >
+                        Enter a password
+                    </span>
+
+                </div>
+
+
+                <!-- REGISTER BUTTON -->
 
                 <button
-                    type="button"
-                    class="password-toggle"
-                    id="passwordToggle"
+                    type="submit"
+                    class="btn"
+                    id="registerButton"
                 >
-                    Show
+
+                    <span class="button-text">
+                        Create Account
+                    </span>
+
+                    <span class="spinner"></span>
+
                 </button>
 
+            </form>
+
+
+            <!-- LOGIN -->
+
+            <div class="footer-note">
+
+                Already have an account?
+
+                <a href="{% url 'login' %}">
+                    Login
+                </a>
+
             </div>
-
-            <div class="password-strength">
-
-                <div
-                    class="strength-bar"
-                    id="strengthBar"
-                ></div>
-
-            </div>
-
-            <span
-                class="strength-text"
-                id="strengthText"
-            >
-                Enter a password
-            </span>
 
         </div>
 
 
-        <!-- REGISTER BUTTON -->
+        <!-- COPYRIGHT -->
 
-        <button
-            type="submit"
-            class="btn"
-            id="registerButton"
-        >
+        <div class="copyright">
 
-            <span class="button-text">
-                Create Account
-            </span>
+            © 2026
+            <strong>Noti52me</strong>
+            · Developed by V Nagrjuna
 
-            <span class="spinner"></span>
-
-        </button>
-
-    </form>
-
-
-    <div class="footer-note">
-
-        Already registered?
-
-        <a href="{% url 'login' %}">
-            Log in here
-        </a>
+        </div>
 
     </div>
 
-</div>
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+
+    <script>
+
+        /* =========================
+           MOBILE VALIDATION
+        ========================== */
+
+        const mobileInput =
+            document.getElementById("mobile");
+
+        mobileInput.addEventListener(
+            "input",
+            function () {
+
+                this.value =
+                    this.value
+                        .replace(/[^0-9]/g, "")
+                        .slice(0, 10);
+
+            }
+        );
 
 
-<script>
+        /* =========================
+           PASSWORD SHOW / HIDE
+        ========================== */
 
-    /* =========================
-       MOBILE VALIDATION
-    ========================= */
+        const passwordInput =
+            document.getElementById("password");
 
-    const mobileInput =
-        document.getElementById("mobile");
+        const passwordToggle =
+            document.getElementById("passwordToggle");
 
-    mobileInput.addEventListener("input", function () {
+        passwordToggle.addEventListener(
+            "click",
+            function () {
 
-        this.value =
-            this.value
-                .replace(/[^0-9]/g, "")
-                .slice(0, 10);
+                if (passwordInput.type === "password") {
 
-    });
+                    passwordInput.type = "text";
 
+                    this.textContent = "Hide";
 
-    /* =========================
-       PASSWORD SHOW / HIDE
-    ========================= */
+                } else {
 
-    const passwordInput =
-        document.getElementById("password");
+                    passwordInput.type = "password";
 
-    const passwordToggle =
-        document.getElementById("passwordToggle");
+                    this.textContent = "Show";
 
-    passwordToggle.addEventListener("click", function () {
+                }
 
-        if (passwordInput.type === "password") {
-
-            passwordInput.type = "text";
-
-            this.textContent = "Hide";
-
-        } else {
-
-            passwordInput.type = "password";
-
-            this.textContent = "Show";
-
-        }
-
-    });
+            }
+        );
 
 
-    /* =========================
-       PASSWORD STRENGTH
-    ========================= */
+        /* =========================
+           PASSWORD STRENGTH
+        ========================== */
 
-    const strengthBar =
-        document.getElementById("strengthBar");
+        const strengthBar =
+            document.getElementById("strengthBar");
 
-    const strengthText =
-        document.getElementById("strengthText");
+        const strengthText =
+            document.getElementById("strengthText");
 
-    passwordInput.addEventListener("input", function () {
+        passwordInput.addEventListener(
+            "input",
+            function () {
 
-        const password = this.value;
+                const password = this.value;
 
-        let strength = 0;
-
-        if (password.length >= 6) {
-            strength++;
-        }
-
-        if (password.length >= 8) {
-            strength++;
-        }
-
-        if (/[A-Z]/.test(password)) {
-            strength++;
-        }
-
-        if (/[0-9]/.test(password)) {
-            strength++;
-        }
-
-        if (/[^A-Za-z0-9]/.test(password)) {
-            strength++;
-        }
+                let strength = 0;
 
 
-        if (!password) {
+                if (password.length >= 6) {
+                    strength++;
+                }
 
-            strengthBar.style.width = "0%";
+                if (password.length >= 8) {
+                    strength++;
+                }
 
-            strengthText.textContent =
-                "Enter a password";
+                if (/[A-Z]/.test(password)) {
+                    strength++;
+                }
 
-        } else if (strength <= 2) {
+                if (/[0-9]/.test(password)) {
+                    strength++;
+                }
 
-            strengthBar.style.width = "35%";
-
-            strengthBar.style.background =
-                "#ef4444";
-
-            strengthText.textContent =
-                "Weak password";
-
-        } else if (strength <= 3) {
-
-            strengthBar.style.width = "65%";
-
-            strengthBar.style.background =
-                "#f59e0b";
-
-            strengthText.textContent =
-                "Medium password";
-
-        } else {
-
-            strengthBar.style.width = "100%";
-
-            strengthBar.style.background =
-                "#22c55e";
-
-            strengthText.textContent =
-                "Strong password";
-
-        }
-
-    });
+                if (/[^A-Za-z0-9]/.test(password)) {
+                    strength++;
+                }
 
 
-    /* =========================
-       FORM SUBMIT ANIMATION
-    ========================= */
+                if (!password) {
 
-    const form =
-        document.getElementById("registerForm");
+                    strengthBar.style.width = "0%";
 
-    const registerButton =
-        document.getElementById("registerButton");
+                    strengthBar.style.background =
+                        "#25d366";
 
-    form.addEventListener("submit", function () {
+                    strengthText.textContent =
+                        "Enter a password";
 
-        if (!form.checkValidity()) {
-            return;
-        }
+                }
 
-        registerButton.classList.add("loading");
+                else if (strength <= 2) {
 
-    });
+                    strengthBar.style.width = "35%";
 
-</script>
+                    strengthBar.style.background =
+                        "#ef4444";
+
+                    strengthText.textContent =
+                        "Weak password";
+
+                }
+
+                else if (strength <= 3) {
+
+                    strengthBar.style.width = "65%";
+
+                    strengthBar.style.background =
+                        "#f59e0b";
+
+                    strengthText.textContent =
+                        "Medium password";
+
+                }
+
+                else {
+
+                    strengthBar.style.width = "100%";
+
+                    strengthBar.style.background =
+                        "#25d366";
+
+                    strengthText.textContent =
+                        "Strong password";
+
+                }
+
+            }
+        );
+
+
+        /* =========================
+           FORM SUBMIT ANIMATION
+        ========================== */
+
+        const form =
+            document.getElementById("registerForm");
+
+        const registerButton =
+            document.getElementById("registerButton");
+
+        form.addEventListener(
+            "submit",
+            function () {
+
+                if (!form.checkValidity()) {
+                    return;
+                }
+
+                registerButton.classList.add("loading");
+
+            }
+        );
+
+    </script>
 
 </body>
+
 </html>

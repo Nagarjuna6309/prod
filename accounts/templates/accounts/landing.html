@@ -1,0 +1,1208 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Noti52me — Schedule. Remember. Connect.</title>
+
+    <meta name="description"
+          content="Noti52me helps you schedule WhatsApp messages, birthday wishes, reminders and notifications exactly when you want.">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #050505;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================== */
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+
+            background: rgba(5, 5, 5, 0.88);
+            backdrop-filter: blur(15px);
+
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: auto;
+
+            height: 72px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 24px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: #25d366;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .nav-links a {
+            color: #cfcfcf;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #25d366;
+        }
+
+        .nav-login {
+            border: 1px solid #25d366;
+            padding: 9px 18px;
+            border-radius: 8px;
+            color: #25d366 !important;
+        }
+
+        .nav-login:hover {
+            background: #25d366;
+            color: #000 !important;
+        }
+
+        /* =========================
+           HERO
+        ========================== */
+
+        .hero {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 120px 20px 80px;
+
+            background:
+                radial-gradient(
+                    circle at 50% 30%,
+                    rgba(37, 211, 102, 0.15),
+                    transparent 45%
+                );
+        }
+
+        .hero-content {
+            max-width: 900px;
+        }
+
+        .badge {
+            display: inline-block;
+
+            padding: 8px 16px;
+            margin-bottom: 25px;
+
+            border-radius: 30px;
+
+            background: rgba(37, 211, 102, 0.10);
+            border: 1px solid rgba(37, 211, 102, 0.30);
+
+            color: #25d366;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .hero h1 {
+            font-size: clamp(44px, 7vw, 78px);
+            line-height: 1.05;
+
+            letter-spacing: -3px;
+
+            margin-bottom: 25px;
+        }
+
+        .hero h1 span {
+            color: #25d366;
+        }
+
+        .hero p {
+            max-width: 700px;
+            margin: auto;
+
+            color: #a9a9a9;
+
+            font-size: 18px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+
+            margin-top: 35px;
+
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 14px 25px;
+
+            border-radius: 9px;
+
+            font-weight: 700;
+            font-size: 15px;
+
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: #25d366;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.25);
+        }
+
+        .btn-secondary {
+            border: 1px solid #333;
+            color: #fff;
+            background: #111;
+        }
+
+        .btn-secondary:hover {
+            border-color: #25d366;
+        }
+
+        /* =========================
+           WHATSAPP FEATURE
+        ========================== */
+
+        .whatsapp-section {
+            padding: 100px 20px;
+
+            background: #080808;
+        }
+
+        .section-container {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        .section-heading {
+            text-align: center;
+            margin-bottom: 55px;
+        }
+
+        .section-heading .label {
+            color: #25d366;
+
+            text-transform: uppercase;
+            letter-spacing: 2px;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .section-heading h2 {
+            font-size: clamp(32px, 5vw, 52px);
+            margin-top: 10px;
+        }
+
+        .section-heading p {
+            color: #888;
+            max-width: 650px;
+            margin: 15px auto 0;
+        }
+
+        .whatsapp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+            gap: 35px;
+
+            align-items: center;
+        }
+
+        .whatsapp-card {
+            padding: 35px;
+
+            background: #0e0e0e;
+
+            border: 1px solid #1d1d1d;
+
+            border-radius: 18px;
+        }
+
+        .whatsapp-icon {
+            width: 58px;
+            height: 58px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 15px;
+
+            background: rgba(37, 211, 102, 0.12);
+
+            color: #25d366;
+
+            font-size: 28px;
+
+            margin-bottom: 20px;
+        }
+
+        .whatsapp-card h3 {
+            font-size: 25px;
+            margin-bottom: 12px;
+        }
+
+        .whatsapp-card p {
+            color: #999;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-top: 25px;
+        }
+
+        .feature-list li {
+            margin-bottom: 13px;
+            color: #c8c8c8;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            color: #25d366;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        /* =========================
+           SCHEDULE PREVIEW
+        ========================== */
+
+        .schedule-preview {
+            padding: 25px;
+
+            background: #050505;
+
+            border: 1px solid #222;
+
+            border-radius: 18px;
+
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+        .preview-header strong {
+            font-size: 18px;
+        }
+
+        .status {
+            font-size: 11px;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            background: rgba(37, 211, 102, 0.12);
+            color: #25d366;
+        }
+
+        .message-box {
+            background: #111;
+
+            border: 1px solid #222;
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            margin-bottom: 12px;
+        }
+
+        .message-box .person {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .message-box .message {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .message-time {
+            margin-top: 10px;
+
+            color: #25d366;
+
+            font-size: 13px;
+        }
+
+        /* =========================
+           FEATURES
+        ========================== */
+
+        .features {
+            padding: 100px 20px;
+        }
+
+        .feature-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 20px;
+        }
+
+        .feature {
+            padding: 30px;
+
+            background: #0c0c0c;
+
+            border: 1px solid #1c1c1c;
+
+            border-radius: 16px;
+
+            transition: 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            border-color: #25d366;
+        }
+
+        .feature-number {
+            color: #25d366;
+            font-size: 13px;
+            font-weight: bold;
+
+            margin-bottom: 20px;
+        }
+
+        .feature h3 {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .feature p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* =========================
+           FUTURE
+        ========================== */
+
+        .future {
+            padding: 100px 20px;
+
+            background: #080808;
+        }
+
+        .future-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+        }
+
+        .future-card {
+            padding: 25px;
+
+            border: 1px solid #1c1c1c;
+
+            background: #0d0d0d;
+
+            border-radius: 14px;
+        }
+
+        .future-card h3 {
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        .future-card p {
+            font-size: 13px;
+            color: #777;
+        }
+
+        .coming {
+            display: inline-block;
+
+            margin-bottom: 15px;
+
+            font-size: 10px;
+
+            color: #25d366;
+
+            border: 1px solid rgba(37, 211, 102, 0.25);
+
+            padding: 4px 7px;
+
+            border-radius: 10px;
+        }
+
+        /* =========================
+           CTA
+        ========================== */
+
+        .cta {
+            padding: 110px 20px;
+
+            text-align: center;
+        }
+
+        .cta-box {
+            max-width: 850px;
+
+            margin: auto;
+
+            padding: 60px 30px;
+
+            border-radius: 25px;
+
+            border: 1px solid #222;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    rgba(37, 211, 102, 0.10),
+                    transparent 60%
+                );
+        }
+
+        .cta h2 {
+            font-size: clamp(32px, 5vw, 50px);
+            margin-bottom: 15px;
+        }
+
+        .cta p {
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        /* =========================
+           FOOTER
+        ========================== */
+
+        footer {
+            border-top: 1px solid #1b1b1b;
+
+            padding: 35px 20px;
+
+            text-align: center;
+
+            color: #666;
+
+            font-size: 13px;
+        }
+
+        footer strong {
+            color: #aaa;
+        }
+
+        /* =========================
+           MOBILE
+        ========================== */
+
+        @media (max-width: 850px) {
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links a:not(.nav-login) {
+                display: none;
+            }
+
+            .whatsapp-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .future-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .nav-container {
+                padding: 0 15px;
+            }
+
+            .logo {
+                font-size: 21px;
+            }
+
+            .hero {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .hero h1 {
+                letter-spacing: -2px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .future-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .whatsapp-card {
+                padding: 25px;
+            }
+
+            .cta-box {
+                padding: 45px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =========================
+     NAVBAR
+========================== -->
+
+<nav>
+    <div class="nav-container">
+
+        <a href="{% url 'home' %}" class="logo">
+            Noti<span>52</span>me
+        </a>
+
+        <div class="nav-links">
+
+            <a href="#whatsapp">
+                WhatsApp
+            </a>
+
+            <a href="#features">
+                Features
+            </a>
+
+            <a href="#future">
+                Future
+            </a>
+
+            <a href="{% url 'login' %}" class="nav-login">
+                Login
+            </a>
+
+        </div>
+
+    </div>
+</nav>
+
+
+<!-- =========================
+     HERO
+========================== -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="badge">
+            Smart scheduling & notifications
+        </div>
+
+        <h1>
+            Never forget
+            <span>an important moment.</span>
+        </h1>
+
+        <p>
+            Schedule WhatsApp messages, birthday wishes,
+            reminders and important notifications —
+            and let Noti52me take care of the timing.
+        </p>
+
+        <div class="hero-buttons">
+
+            <a href="{% url 'register' %}" class="btn btn-primary">
+                Get Started
+            </a>
+
+            <a href="#whatsapp" class="btn btn-secondary">
+                Explore WhatsApp Scheduling
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     WHATSAPP
+========================== -->
+
+<section class="whatsapp-section" id="whatsapp">
+
+    <div class="section-container">
+
+        <div class="section-heading">
+
+            <div class="label">
+                Main Feature
+            </div>
+
+            <h2>
+                WhatsApp Scheduling
+            </h2>
+
+            <p>
+                Send your WhatsApp messages exactly when
+                you want — even when you're busy or asleep.
+            </p>
+
+        </div>
+
+
+        <div class="whatsapp-grid">
+
+            <div class="whatsapp-card">
+
+                <div class="whatsapp-icon">
+                    ☎
+                </div>
+
+                <h3>
+                    Send it at the right moment.
+                </h3>
+
+                <p>
+                    Create a message today and choose
+                    the exact date and time it should be sent.
+                </p>
+
+                <ul class="feature-list">
+
+                    <li>
+                        Schedule WhatsApp messages
+                    </li>
+
+                    <li>
+                        Exact date & time delivery
+                    </li>
+
+                    <li>
+                        Birthday wishes
+                    </li>
+
+                    <li>
+                        Anniversary wishes
+                    </li>
+
+                    <li>
+                        Personal reminders
+                    </li>
+
+                    <li>
+                        Manage scheduled messages
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <div class="schedule-preview">
+
+                <div class="preview-header">
+
+                    <strong>
+                        Scheduled Messages
+                    </strong>
+
+                    <span class="status">
+                        ACTIVE
+                    </span>
+
+                </div>
+
+
+                <div class="message-box">
+
+                    <div class="person">
+                        🎂 Birthday Wish
+                    </div>
+
+                    <div class="message">
+                        Happy Birthday! 🎉
+                        Wishing you an amazing year ahead.
+                    </div>
+
+                    <div class="message-time">
+                        Tomorrow · 12:00 AM
+                    </div>
+
+                </div>
+
+
+                <div class="message-box">
+
+                    <div class="person">
+                        ❤️ Anniversary
+                    </div>
+
+                    <div class="message">
+                        Happy Anniversary ❤️
+                        Have a beautiful day together.
+                    </div>
+
+                    <div class="message-time">
+                        14 Feb · 08:00 AM
+                    </div>
+
+                </div>
+
+
+                <div class="message-box">
+
+                    <div class="person">
+                        🔔 Reminder
+                    </div>
+
+                    <div class="message">
+                        Don't forget the meeting today.
+                    </div>
+
+                    <div class="message-time">
+                        Today · 09:30 AM
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FEATURES
+========================== -->
+
+<section class="features" id="features">
+
+    <div class="section-container">
+
+        <div class="section-heading">
+
+            <div class="label">
+                Simple & Powerful
+            </div>
+
+            <h2>
+                Built for important moments.
+            </h2>
+
+            <p>
+                Noti52me is designed to make scheduling
+                personal notifications simple.
+            </p>
+
+        </div>
+
+
+        <div class="feature-grid">
+
+            <div class="feature">
+
+                <div class="feature-number">
+                    01
+                </div>
+
+                <h3>
+                    Exact Timing
+                </h3>
+
+                <p>
+                    Choose the exact date and time
+                    for your message.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div class="feature-number">
+                    02
+                </div>
+
+                <h3>
+                    Birthday Wishes
+                </h3>
+
+                <p>
+                    Schedule birthday messages in advance
+                    so you never miss someone's special day.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div class="feature-number">
+                    03
+                </div>
+
+                <h3>
+                    Easy Management
+                </h3>
+
+                <p>
+                    View, edit or cancel your scheduled
+                    messages from your account.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div class="feature-number">
+                    04
+                </div>
+
+                <h3>
+                    Secure Account
+                </h3>
+
+                <p>
+                    Your personal account and scheduling
+                    data stay protected.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div class="feature-number">
+                    05
+                </div>
+
+                <h3>
+                    Web & Mobile
+                </h3>
+
+                <p>
+                    Use Noti52me from the web and
+                    mobile applications.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div class="feature-number">
+                    06
+                </div>
+
+                <h3>
+                    Smart Notifications
+                </h3>
+
+                <p>
+                    Keep important events and reminders
+                    organized in one place.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FUTURE
+========================== -->
+
+<section class="future" id="future">
+
+    <div class="section-container">
+
+        <div class="section-heading">
+
+            <div class="label">
+                Coming Soon
+            </div>
+
+            <h2>
+                More than WhatsApp.
+            </h2>
+
+            <p>
+                Noti52me will continue to grow into
+                a complete personal scheduling platform.
+            </p>
+
+        </div>
+
+
+        <div class="future-grid">
+
+            <div class="future-card">
+
+                <span class="coming">
+                    COMING SOON
+                </span>
+
+                <h3>
+                    📧 Email Scheduling
+                </h3>
+
+                <p>
+                    Schedule emails for a future date
+                    and time.
+                </p>
+
+            </div>
+
+
+            <div class="future-card">
+
+                <span class="coming">
+                    COMING SOON
+                </span>
+
+                <h3>
+                    📱 SMS
+                </h3>
+
+                <p>
+                    Schedule important SMS notifications.
+                </p>
+
+            </div>
+
+
+            <div class="future-card">
+
+                <span class="coming">
+                    COMING SOON
+                </span>
+
+                <h3>
+                    📸 Instagram
+                </h3>
+
+                <p>
+                    Plan and schedule social media content.
+                </p>
+
+            </div>
+
+
+            <div class="future-card">
+
+                <span class="coming">
+                    COMING SOON
+                </span>
+
+                <h3>
+                    ▶️ YouTube
+                </h3>
+
+                <p>
+                    Future tools for YouTube scheduling
+                    and publishing.
+                </p>
+
+            </div>
+
+
+            <div class="future-card">
+
+                <span class="coming">
+                    COMING SOON
+                </span>
+
+                <h3>
+                    🔔 Smart Reminders
+                </h3>
+
+                <p>
+                    Personal reminders for tasks,
+                    events and important dates.
+                </p>
+
+            </div>
+
+
+            <div class="future-card">
+
+                <span class="coming">
+                    COMING SOON
+                </span>
+
+                <h3>
+                    🎂 Birthday Manager
+                </h3>
+
+                <p>
+                    Store birthdays and automatically
+                    schedule wishes.
+                </p>
+
+            </div>
+
+
+            <div class="future-card">
+
+                <span class="coming">
+                    COMING SOON
+                </span>
+
+                <h3>
+                    📅 Calendar
+                </h3>
+
+                <p>
+                    Organize your scheduled notifications
+                    through a calendar.
+                </p>
+
+            </div>
+
+
+            <div class="future-card">
+
+                <span class="coming">
+                    COMING SOON
+                </span>
+
+                <h3>
+                    🤖 Automation
+                </h3>
+
+                <p>
+                    Automate recurring messages and
+                    notifications.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     CTA
+========================== -->
+
+<section class="cta">
+
+    <div class="cta-box">
+
+        <h2>
+            Make every moment count.
+        </h2>
+
+        <p>
+            Schedule it once.
+            Noti52me remembers it for you.
+        </p>
+
+        <a href="{% url 'register' %}" class="btn btn-primary">
+            Create Your Account
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FOOTER
+========================== -->
+
+<footer>
+
+    <div>
+        © 2026
+        <strong>
+            Noti52me dev by V Nagrjuna
+        </strong>.
+        All rights reserved.
+    </div>
+
+</footer>
+
+
+</body>
+</html>
