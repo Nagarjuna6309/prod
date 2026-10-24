@@ -1,3 +1,4 @@
+
 """
 Django settings for config project.
 """
@@ -12,12 +13,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 # ============================================================
 
+
+# ============================================================
+# SECURITY
+# ============================================================
+
 SECRET_KEY = os.environ.get(
     "SECRET_KEY",
-    "django-insecure-local-development-only-change-before-deployment",
+    "django-insecure-local-development-key-change-in-production",
 )
 
 DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
+
 
 
 # ============================================================
@@ -34,13 +41,22 @@ ALLOWED_HOSTS = [
 ]
 
 
-# Render automatically provides RENDER_EXTERNAL_HOSTNAME.
+# Render hostname
 RENDER_EXTERNAL_HOSTNAME = os.environ.get(
     "RENDER_EXTERNAL_HOSTNAME"
 )
 
 if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    if RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+
+# Optional custom domain
+CUSTOM_DOMAIN = os.environ.get("CUSTOM_DOMAIN")
+
+if CUSTOM_DOMAIN:
+    if CUSTOM_DOMAIN not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(CUSTOM_DOMAIN)
 
 
 # ============================================================
@@ -66,6 +82,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+
     "whitenoise.middleware.WhiteNoiseMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -112,12 +129,6 @@ TEMPLATES = [
 # ============================================================
 # DATABASE
 # ============================================================
-
-# Local development:
-#     SQLite
-#
-# Render:
-#     PostgreSQL through DATABASE_URL
 
 if os.environ.get("DATABASE_URL"):
 
@@ -182,7 +193,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = os.environ.get(
+    "TIME_ZONE",
+    "Asia/Kolkata",
+)
 
 USE_I18N = True
 
@@ -215,12 +229,44 @@ MEDIA_ROOT = BASE_DIR / "media"
 # EMAIL
 # ============================================================
 
-MAILERS = {
-    "default": {
-        "BACKEND":
-            "django.core.mail.backends.console.EmailBackend",
-    },
-}
+EMAIL_BACKEND = (
+    "django.core.mail.backends.smtp.EmailBackend"
+)
+
+EMAIL_HOST = os.environ.get(
+    "EMAIL_HOST",
+    "smtp.gmail.com",
+)
+
+EMAIL_PORT = int(
+    os.environ.get(
+        "EMAIL_PORT",
+        "587",
+    )
+)
+
+EMAIL_USE_TLS = (
+    os.environ.get(
+        "EMAIL_USE_TLS",
+        "True",
+    ).lower()
+    == "true"
+)
+
+EMAIL_HOST_USER = os.environ.get(
+    "EMAIL_HOST_USER",
+    "",
+)
+
+EMAIL_HOST_PASSWORD = os.environ.get(
+    "EMAIL_HOST_PASSWORD",
+    "",
+)
+
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL",
+    EMAIL_HOST_USER,
+)
 
 
 # ============================================================
@@ -251,28 +297,26 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 
 
+
+
 # ============================================================
-# RENDER / HTTPS
+# RENDER / PRODUCTION SECURITY
 # ============================================================
 
-if not DEBUG:
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-    SECURE_PROXY_SSL_HEADER = (
-        "HTTP_X_FORWARDED_PROTO",
-        "https",
-    )
+SECURE_SSL_REDIRECT = not DEBUG
 
-    SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
-    SESSION_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
 
-    CSRF_COOKIE_SECURE = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
 
-    SECURE_HSTS_SECONDS = 31536000
-
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-
-    SECURE_HSTS_PRELOAD = True
 
 
 # ============================================================
@@ -281,26 +325,18 @@ if not DEBUG:
 
 CSRF_TRUSTED_ORIGINS = []
 
-render_hostname = os.environ.get(
-    "RENDER_EXTERNAL_HOSTNAME"
-)
 
-if render_hostname:
+if RENDER_EXTERNAL_HOSTNAME:
 
     CSRF_TRUSTED_ORIGINS.append(
-        f"https://{render_hostname}"
+        f"https://{RENDER_EXTERNAL_HOSTNAME}"
     )
 
 
-# Optional custom domain.
-custom_domain = os.environ.get(
-    "CUSTOM_DOMAIN"
-)
-
-if custom_domain:
+if CUSTOM_DOMAIN:
 
     CSRF_TRUSTED_ORIGINS.append(
-        f"https://{custom_domain}"
+        f"https://{CUSTOM_DOMAIN}"
     )
 
 
@@ -308,31 +344,15 @@ if custom_domain:
 # DEFAULT PRIMARY KEY
 # ============================================================
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+DEFAULT_AUTO_FIELD = (
+    "django.db.models.BigAutoField"
+)
 
 
 
+# ============================================================
+# ADDITIONAL SECURITY
+# ============================================================
 
-'''EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER'''
-
-
-
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-        "OPTIONS": {
-            "host": "smtp.gmail.com",
-            "port": 587,
-            "username": ,
-            "password": ,
-            "use_tls": True,
-        },
-    },
-}
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
