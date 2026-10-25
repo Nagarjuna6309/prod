@@ -1568,6 +1568,14 @@
                     </div>
 
                 {% endif %}
+                
+                {% if qr_data.error %}
+                    <div class="alert alert-error" style="margin-top: 15px;">
+                        <strong>QR generation failed:</strong>
+                        {{ qr_data.error }}
+                    </div>
+                {% endif %}
+
 
             </div>
 

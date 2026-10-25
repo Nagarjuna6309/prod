@@ -23,7 +23,7 @@ SECRET_KEY = os.environ.get(
     "django-insecure-local-development-key-change-in-production",
 )
 
-DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
+DEBUG =False
 
 
 
@@ -356,3 +356,17 @@ DEFAULT_AUTO_FIELD = (
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
+
+
+
+
+# ============================================================
+# CELERY BEAT - SCHEDULED WHATSAPP MESSAGES
+# ============================================================
+
+CELERY_BEAT_SCHEDULE = {
+    "process-scheduled-whatsapp-messages": {
+        "task": "whatsapp_messages.tasks.process_scheduled_whatsapp_messages",
+        "schedule": 10.0,  # Check for due messages every 10 seconds
+    },
+}

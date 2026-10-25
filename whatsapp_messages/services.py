@@ -701,3 +701,68 @@ def get_pairing_code(self, phone_number: str) -> dict:
             "success": False,
             "error": "Evolution API returned an invalid response.",
         }
+        
+        
+
+
+
+
+
+
+
+@staticmethod
+def _format_qr_response(data: dict) -> dict:
+    """Normalize Evolution API QR responses."""
+
+    if not isinstance(data, dict):
+        return {
+            "connected": False,
+            "state": "invalid_response",
+            "qrcode": None,
+            "base64": None,
+            "pairingCode": None,
+            "error": "Evolution API returned an unexpected response.",
+        }
+
+    nested = data.get("data")
+    if isinstance(nested, dict):
+        data = {**data, **nested}
+
+    qr_object = data.get("qrcode")
+
+    if isinstance(qr_object, dict):
+        raw_base64 = (
+            qr_object.get("base64")
+            or data.get("base64")
+            or ""
+        )
+        pairing_code = (
+            qr_object.get("pairingCode")
+            or data.get("pairingCode")
+        )
+    else:
+        raw_base64 = data.get("base64") or (
+            qr_object if isinstance(qr_object, str) else ""
+        )
+        pairing_code = data.get("pairingCode")
+
+    if raw_base64 and raw_base64.startswith("data:image"):
+        image_data = raw_base64
+    elif raw_base64:
+        image_data = f"data:image/png;base64,{raw_base64}"
+    else:
+        image_data = None
+
+    return {
+        "connected": False,
+        "state": "qr" if image_data else "waiting_for_qr",
+        "qrcode": image_data,
+        "base64": image_data,
+        "code": data.get("code"),
+        "pairingCode": pairing_code,
+        "error": (
+            None if image_data or pairing_code
+            else "Evolution API returned no QR image. "
+                    "Check the instance state and API logs."
+        ),
+    }
