@@ -19,33 +19,39 @@ class ConnectionStatus(dict):
         return bool(self.get("connected", False))
 
 
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+
+
 class EvolutionAPIService:
-    """
-    Service for communicating with Evolution API.
-    """
-
-    def __init__(self, instance: str = None):
-
-        self.base_url = settings.EVOLUTION_API_URL.rstrip("/")
-        self.api_key = settings.EVOLUTION_API_KEY
+    def __init__(self, instance_name=None):
+        self.base_url = getattr(
+            settings, "EVOLUTION_API_URL", ""
+        )
+        self.api_key = getattr(
+            settings, "EVOLUTION_API_KEY", ""
+        )
         self.instance_name = (
             instance_name
-            or settings.EVOLUTION_API_INSTANCE_NAME
+            or getattr(settings, "EVOLUTION_INSTANCE_NAME", "")
         )
 
-        if not self.api_key:
+        if not self.base_url or not self.api_key:
             raise ImproperlyConfigured(
-                "Missing EVOLUTION_API_KEY in settings.py."
+                "EVOLUTION_API_URL and EVOLUTION_API_KEY "
+                "must be configured."
             )
 
-        if not self.instance:
+        if not self.instance_name:
             raise ImproperlyConfigured(
-                "Missing EVOLUTION_INSTANCE_NAME in settings.py."
+                "EVOLUTION_INSTANCE_NAME must be configured."
             )
 
+        self.base_url = self.base_url.rstrip("/")
         self.headers = {
             "apikey": self.api_key,
             "Content-Type": "application/json",
+        }
         }
 
     # ==========================================================
@@ -62,9 +68,7 @@ class EvolutionAPIService:
         """
 
         try:
-            service = cls(
-                instance=instance_name
-            )
+            service = cls()
 
         except ImproperlyConfigured as exc:
             logger.error(
