@@ -52,7 +52,7 @@ class EvolutionAPIService:
             "apikey": self.api_key,
             "Content-Type": "application/json",
         }
-        }
+        
 
     # ==========================================================
     # CONNECTION STATUS
