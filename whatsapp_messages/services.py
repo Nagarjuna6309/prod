@@ -471,7 +471,7 @@ class EvolutionAPIService:
 
         endpoint = (
             f"{self.base_url}/message/"
-            f"sendText/{self.instance}"
+            f"sendText/{self.instance_name}"
         )
 
         payload = {
@@ -548,7 +548,7 @@ class EvolutionAPIService:
 
         endpoint = (
             f"{self.base_url}/instance/"
-            f"logout/{self.instance}"
+            f"logout/{self.instance_name}"
         )
 
         try:
@@ -620,7 +620,7 @@ def get_pairing_code(self, phone_number: str) -> dict:
         # Ask Evolution API to generate a pairing code.
         url = (
             f"{self.base_url.rstrip('/')}/instance/connect/"
-            f"{self.instance}"
+            f"{self.instance_name}"
         )
 
         response = requests.get(
