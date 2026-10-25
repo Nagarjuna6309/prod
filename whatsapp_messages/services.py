@@ -182,9 +182,7 @@ class EvolutionAPIService:
         """
 
         try:
-            service = cls(
-                instance=instance_name
-            )
+            service = cls()
 
         except ImproperlyConfigured as exc:
 
