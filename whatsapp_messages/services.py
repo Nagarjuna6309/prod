@@ -26,9 +26,12 @@ class EvolutionAPIService:
 
     def __init__(self, instance: str = None):
 
-        self.base_url = settings.EVOLUTION_API_URL
+        self.base_url = settings.EVOLUTION_API_URL.rstrip("/")
         self.api_key = settings.EVOLUTION_API_KEY
-        self.instance_name = settings.EVOLUTION_INSTANCE_NAME
+        self.instance_name = (
+            instance_name
+            or settings.EVOLUTION_API_INSTANCE_NAME
+        )
 
         if not self.api_key:
             raise ImproperlyConfigured(
