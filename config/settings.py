@@ -370,3 +370,19 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": 10.0,  # Check for due messages every 10 seconds
     },
 }
+
+
+
+import os
+
+EVOLUTION_API_URL = os.environ.get(
+    "EVOLUTION_API_URL", ""
+).rstrip("/")
+
+EVOLUTION_API_KEY = os.environ.get(
+    "EVOLUTION_API_KEY", ""
+)
+
+EVOLUTION_INSTANCE_NAME = os.environ.get(
+    "EVOLUTION_INSTANCE_NAME", "noti5me"
+)

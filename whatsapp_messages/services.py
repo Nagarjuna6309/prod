@@ -26,33 +26,9 @@ class EvolutionAPIService:
 
     def __init__(self, instance: str = None):
 
-        self.base_url = (
-            getattr(
-                settings,
-                "EVOLUTION_API_URL",
-                None,
-            )
-            or "http://localhost:8080"
-        ).rstrip("/")
-
-        self.api_key = (
-            getattr(
-                settings,
-                "EVOLUTION_API_KEY",
-                None,
-            )
-            or ""
-        ).strip()
-
-        self.instance = (
-            instance
-            or getattr(
-                settings,
-                "EVOLUTION_INSTANCE_NAME",
-                None,
-            )
-            or "default"
-        )
+        self.base_url = settings.EVOLUTION_API_URL
+        self.api_key = settings.EVOLUTION_API_KEY
+        self.instance_name = settings.EVOLUTION_INSTANCE_NAME
 
         if not self.api_key:
             raise ImproperlyConfigured(
