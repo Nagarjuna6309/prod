@@ -305,16 +305,18 @@ class EvolutionAPIService:
             # be diagnosed rather than silently recreated.
             if response.status_code not in (200, 201):
                 logger.error(
-                    "Instance creation failed: HTTP %s; response=%s",
-                    response.status_code,
-                    response.text[:500],
-                )
+                "Evolution API instance creation failed. "
+                "URL=%s HTTP=%s BODY=%s",
+                endpoint,
+                response.status_code,
+                response.text[:1000],
+            )
+
                 return cls._error_result(
                     "creation_failed",
-                    f"Evolution API could not create the instance "
-                    f"(HTTP {response.status_code}). Check whether "
-                    "the instance already exists.",
-                )
+                    f"Instance creation failed (HTTP {response.status_code}). "
+                    f"API response: {response.text[:500]}",
+        )
 
             try:
                 data = response.json()
