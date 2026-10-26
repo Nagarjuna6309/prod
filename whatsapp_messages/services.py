@@ -1,3 +1,4 @@
+
 import logging
 
 import requests
@@ -9,485 +10,492 @@ logger = logging.getLogger(__name__)
 
 
 class ConnectionStatus(dict):
-    """
-    Dictionary containing WhatsApp connection information.
-
-    The object evaluates to True when WhatsApp is connected.
-    """
+    """Connection information; truthy when WhatsApp is connected."""
 
     def __bool__(self):
         return bool(self.get("connected", False))
 
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-
-
 class EvolutionAPIService:
+    """Client for the Evolution API WhatsApp instance."""
+
     def __init__(self, instance_name=None):
-        self.base_url = getattr(
-            settings, "EVOLUTION_API_URL", ""
-        )
-        self.api_key = getattr(
-            settings, "EVOLUTION_API_KEY", ""
-        )
+        self.base_url = (
+            getattr(settings, "EVOLUTION_API_URL", "") or ""
+        ).strip().rstrip("/")
+
+        self.api_key = (
+            getattr(settings, "EVOLUTION_API_KEY", "") or ""
+        ).strip()
+
         self.instance_name = (
             instance_name
+            or getattr(settings, "EVOLUTION_API_INSTANCE", "")
             or getattr(settings, "EVOLUTION_INSTANCE_NAME", "")
-        )
+            or ""
+        ).strip()
 
-        if not self.base_url or not self.api_key:
+        # Backward compatibility with older code using .instance.
+        self.instance = self.instance_name
+
+        if not self.base_url:
             raise ImproperlyConfigured(
-                "EVOLUTION_API_URL and EVOLUTION_API_KEY "
-                "must be configured."
+                "EVOLUTION_API_URL is not configured."
+            )
+
+        if not self.api_key:
+            raise ImproperlyConfigured(
+                "EVOLUTION_API_KEY is not configured."
             )
 
         if not self.instance_name:
             raise ImproperlyConfigured(
-                "EVOLUTION_INSTANCE_NAME must be configured."
+                "Set EVOLUTION_API_INSTANCE or "
+                "EVOLUTION_INSTANCE_NAME."
             )
 
-        self.base_url = self.base_url.rstrip("/")
         self.headers = {
             "apikey": self.api_key,
             "Content-Type": "application/json",
         }
-        
 
-    # ==========================================================
+    def _url(self, path):
+        return f"{self.base_url}/{path.lstrip('/')}"
+
+    @staticmethod
+    def _error_result(state, message):
+        return {
+            "connected": False,
+            "state": state,
+            "qrcode": None,
+            "base64": None,
+            "pairingCode": None,
+            "error": message,
+        }
+
+    # ----------------------------------------------------------
+    # QR RESPONSE NORMALIZATION
+    # ----------------------------------------------------------
+
+    @staticmethod
+    def _format_qr_response(data):
+        """Normalize common Evolution API QR response formats."""
+
+        if not isinstance(data, dict):
+            return EvolutionAPIService._error_result(
+                "invalid_response",
+                "Evolution API returned an unexpected response.",
+            )
+
+        # Some API versions wrap the response in "data".
+        nested = data.get("data")
+        if isinstance(nested, dict):
+            data = {**data, **nested}
+
+        qr = data.get("qrcode")
+        if isinstance(qr, dict):
+            raw_qr = (
+                qr.get("base64")
+                or qr.get("code")
+                or data.get("base64")
+                or ""
+            )
+            pairing_code = (
+                qr.get("pairingCode")
+                or data.get("pairingCode")
+            )
+        else:
+            raw_qr = (
+                data.get("base64")
+                or (qr if isinstance(qr, str) else "")
+            )
+            pairing_code = data.get("pairingCode")
+
+        # Some responses return a QR string instead of an image.
+        if isinstance(raw_qr, str) and raw_qr.startswith(
+            ("data:image/", "data: image/")
+        ):
+            image = raw_qr.replace("data: image/", "data:image/", 1)
+        elif isinstance(raw_qr, str) and raw_qr:
+            image = f"data:image/png;base64,{raw_qr}"
+        else:
+            image = None
+
+        return {
+            "connected": False,
+            "state": "qr" if image else (
+                "pairing_code" if pairing_code else "waiting_for_qr"
+            ),
+            "qrcode": image,
+            "base64": image,
+            "code": data.get("code"),
+            "pairingCode": pairing_code,
+            "error": (
+                None
+                if image or pairing_code
+                else "Evolution API returned no QR image or pairing code."
+            ),
+        }
+
+    # ----------------------------------------------------------
     # CONNECTION STATUS
-    # ==========================================================
+    # ----------------------------------------------------------
 
     @classmethod
-    def check_connection(
-        cls,
-        instance_name: str = None,
-    ) -> ConnectionStatus:
-        """
-        Check whether the WhatsApp instance is connected.
-        """
-
+    def check_connection(cls, instance_name=None):
         try:
-            service = cls()
-
+            service = cls(instance_name=instance_name)
         except ImproperlyConfigured as exc:
-            logger.error(
-                "Evolution API configuration error: %s",
-                exc,
-            )
+            logger.error("Evolution API configuration error: %s", exc)
+            return ConnectionStatus({
+                "connected": False,
+                "state": "configuration_error",
+                "error": str(exc),
+            })
 
-            return ConnectionStatus(
-                {
-                    "connected": False,
-                    "state": "configuration_error",
-                    "error": str(exc),
-                }
-            )
-
-        endpoint = (
-            f"{service.base_url}/instance/"
-            f"connectionState/{service.instance}"
+        endpoint = service._url(
+            f"instance/connectionState/{service.instance_name}"
         )
 
         try:
             response = requests.get(
                 endpoint,
                 headers=service.headers,
-                timeout=5,
+                timeout=15,
             )
 
-            if response.status_code == 200:
-
-                try:
-                    data = response.json()
-                except ValueError:
-                    data = {}
-
-                state = (
-                    data.get(
-                        "instance",
-                        {},
-                    ).get("state")
-                    or data.get("state")
-                    or ""
-                ).lower()
-
-                is_connected = state in [
-                    "open",
-                    "connected",
-                ]
-
-                return ConnectionStatus(
-                    {
-                        "connected": is_connected,
-                        "state": state or "unknown",
-                        "data": data,
-                    }
+            if not response.ok:
+                logger.warning(
+                    "Connection check returned HTTP %s",
+                    response.status_code,
                 )
-
-            logger.warning(
-                "Evolution API connection check returned HTTP %s",
-                response.status_code,
-            )
-
-            return ConnectionStatus(
-                {
+                return ConnectionStatus({
                     "connected": False,
                     "state": "disconnected",
-                    "error": (
-                        f"HTTP {response.status_code}"
-                    ),
-                }
-            )
+                    "error": f"Evolution API returned HTTP "
+                             f"{response.status_code}.",
+                })
 
-        except requests.exceptions.RequestException as exc:
+            data = response.json()
+            if not isinstance(data, dict):
+                raise ValueError("Unexpected connection response.")
 
-            logger.warning(
-                "Evolution API connection check failed: %s",
-                exc,
-            )
+            nested = data.get("data")
+            if isinstance(nested, dict):
+                data = {**data, **nested}
 
-            return ConnectionStatus(
-                {
-                    "connected": False,
-                    "state": "unreachable",
-                    "error": str(exc),
-                }
-            )
+            instance = data.get("instance")
+            state = (
+                instance.get("state", "")
+                if isinstance(instance, dict)
+                else ""
+            ) or data.get("state", "")
 
-    # ==========================================================
-    # QR CODE
-    # ==========================================================
+            state = str(state).lower()
+
+            return ConnectionStatus({
+                "connected": state in ("open", "connected"),
+                "state": state or "unknown",
+                "data": data,
+            })
+
+        except (requests.RequestException, ValueError) as exc:
+            logger.warning("Connection check failed: %s", exc)
+            return ConnectionStatus({
+                "connected": False,
+                "state": "unreachable",
+                "error": str(exc),
+            })
+
+    # ----------------------------------------------------------
+    # GET OR CREATE QR CODE
+    # ----------------------------------------------------------
 
     @classmethod
-    def get_or_create_qr(
-        cls,
-        instance_name: str = None,
-    ) -> dict:
-        """
-        Get the QR code for the configured Evolution API instance.
-
-        If the instance does not exist, attempt to create it.
-
-        Returns:
-
-            {
-                "connected": bool,
-                "state": str,
-                "qrcode": str | None,
-                "base64": str | None,
-                "pairingCode": str | None,
-                "error": str | None,
-            }
-        """
-
+    def get_or_create_qr(cls, instance_name=None):
         try:
-            service = cls()
-
+            service = cls(instance_name=instance_name)
         except ImproperlyConfigured as exc:
+            return cls._error_result("configuration_error", str(exc))
 
-            return {
-                "connected": False,
-                "state": "configuration_error",
-                "qrcode": None,
-                "base64": None,
-                "pairingCode": None,
-                "error": str(exc),
-            }
-
-        # ------------------------------------------------------
-        # Check current connection first
-        # ------------------------------------------------------
-
-        connection = cls.check_connection(
-            instance_name=service.instance
+        status = cls.check_connection(
+            instance_name=service.instance_name
         )
 
-        if connection.get("connected"):
-
+        if status.get("connected"):
             return {
                 "connected": True,
                 "state": "open",
                 "qrcode": None,
                 "base64": None,
                 "pairingCode": None,
+                "error": None,
             }
 
-        # ------------------------------------------------------
-        # Request QR from existing instance
-        # ------------------------------------------------------
-
-        connect_endpoint = (
-            f"{service.base_url}/instance/"
-            f"connect/{service.instance}"
+        endpoint = service._url(
+            f"instance/connect/{service.instance_name}"
         )
 
         try:
-
             response = requests.get(
-                connect_endpoint,
+                endpoint,
                 headers=service.headers,
-                timeout=10,
+                timeout=30,
             )
 
-            if response.status_code == 200:
+            # Only try to create an instance when the API reports
+            # that the instance is missing.
+            if response.status_code == 404:
+                return cls._create_instance(service)
 
-                try:
-                    data = response.json()
-                except ValueError:
-
-                    return {
-                        "connected": False,
-                        "state": "invalid_response",
-                        "qrcode": None,
-                        "base64": None,
-                        "pairingCode": None,
-                        "error": (
-                            "Evolution API returned "
-                            "an invalid JSON response."
-                        ),
-                    }
-
-                return cls._format_qr_response(
-                    data
+            if not response.ok:
+                logger.error(
+                    "QR request failed: HTTP %s; response=%s",
+                    response.status_code,
+                    response.text[:500],
+                )
+                return cls._error_result(
+                    "api_error",
+                    f"Evolution API returned HTTP "
+                    f"{response.status_code}. Check the API logs "
+                    "and instance configuration.",
                 )
 
-            # --------------------------------------------------
-            # Instance doesn't exist
-            # --------------------------------------------------
-
-            if response.status_code in [400, 404]:
-
-                return cls._create_instance(
-                    service
+            try:
+                data = response.json()
+            except ValueError:
+                return cls._error_result(
+                    "invalid_response",
+                    "Evolution API did not return valid JSON.",
                 )
 
-            return {
-                "connected": False,
-                "state": "error",
-                "qrcode": None,
-                "base64": None,
-                "pairingCode": None,
-                "error": (
-                    "Evolution API returned "
-                    f"HTTP {response.status_code}: "
-                    f"{response.text}"
-                ),
-            }
+            result = cls._format_qr_response(data)
 
-        except requests.exceptions.RequestException as exc:
+            if result.get("error"):
+                logger.warning(
+                    "Evolution API QR response contained no QR image "
+                    "or pairing code."
+                )
 
-            logger.exception(
-                "Error fetching QR code."
-            )
+            return result
 
-            return {
-                "connected": False,
-                "state": "unreachable",
-                "qrcode": None,
-                "base64": None,
-                "pairingCode": None,
-                "error": str(exc),
-            }
-
-    @staticmethod
-    def _format_qr_response(data: dict) -> dict:
-        """
-        Normalize QR response from different Evolution API
-        response formats.
-        """
-
-        qr_object = data.get("qrcode")
-
-        if isinstance(qr_object, dict):
-
-            raw_base64 = (
-                qr_object.get("base64")
-                or data.get("base64")
-                or ""
-            )
-
-            pairing_code = (
-                qr_object.get("pairingCode")
-                or data.get("pairingCode")
-            )
-
-        else:
-
-            raw_base64 = (
-                data.get("base64")
-                or data.get("qrcode")
-                or ""
-            )
-
-            pairing_code = data.get(
-                "pairingCode"
-            )
-
-        formatted_base64 = (
-            raw_base64
-            if raw_base64.startswith(
-                "data:image"
-            )
-            else (
-                f"data:image/png;base64,{raw_base64}"
-                if raw_base64
-                else ""
-            )
-        )
-
-        return {
-            "connected": False,
-            "state": "qr",
-            "qrcode": formatted_base64 or None,
-            "base64": formatted_base64 or None,
-            "code": data.get("code"),
-            "pairingCode": pairing_code,
-        }
+        except requests.RequestException as exc:
+            logger.exception("Failed to retrieve WhatsApp QR code.")
+            return cls._error_result("unreachable", str(exc))
 
     @classmethod
-    def _create_instance(
-        cls,
-        service,
-    ) -> dict:
-        """
-        Create an Evolution API instance.
-        """
-
-        create_endpoint = (
-            f"{service.base_url}/instance/create"
-        )
+    def _create_instance(cls, service):
+        endpoint = service._url("instance/create")
 
         payload = {
-            "instanceName": service.instance,
+            "instanceName": service.instance_name,
             "qrcode": True,
             "integration": "WHATSAPP-BAILEYS",
         }
 
         try:
-
             response = requests.post(
-                create_endpoint,
+                endpoint,
                 json=payload,
                 headers=service.headers,
-                timeout=15,
+                timeout=30,
             )
 
-            if response.status_code not in [
-                200,
-                201,
-            ]:
-
-                return {
-                    "connected": False,
-                    "state": "creation_failed",
-                    "qrcode": None,
-                    "base64": None,
-                    "pairingCode": None,
-                    "error": (
-                        "Failed to create Evolution API "
-                        f"instance. HTTP "
-                        f"{response.status_code}: "
-                        f"{response.text}"
-                    ),
-                }
+            # An existing instance or invalid configuration should
+            # be diagnosed rather than silently recreated.
+            if response.status_code not in (200, 201):
+                logger.error(
+                    "Instance creation failed: HTTP %s; response=%s",
+                    response.status_code,
+                    response.text[:500],
+                )
+                return cls._error_result(
+                    "creation_failed",
+                    f"Evolution API could not create the instance "
+                    f"(HTTP {response.status_code}). Check whether "
+                    "the instance already exists.",
+                )
 
             try:
                 data = response.json()
             except ValueError:
+                return cls._error_result(
+                    "invalid_response",
+                    "Instance creation returned invalid JSON.",
+                )
 
-                return {
-                    "connected": False,
-                    "state": "invalid_response",
-                    "qrcode": None,
-                    "base64": None,
-                    "pairingCode": None,
-                    "error": (
-                        "Evolution API returned "
-                        "an invalid JSON response."
-                    ),
-                }
+            result = cls._format_qr_response(data)
 
-            result = cls._format_qr_response(
-                data
-            )
+            # Some API versions create the instance successfully
+            # but return no QR. Try the connect endpoint once.
+            if not result.get("qrcode") and not result.get("pairingCode"):
+                try:
+                    qr_response = requests.get(
+                        service._url(
+                            f"instance/connect/{service.instance_name}"
+                        ),
+                        headers=service.headers,
+                        timeout=30,
+                    )
+                    if qr_response.ok:
+                        result = cls._format_qr_response(
+                            qr_response.json()
+                        )
+                except (requests.RequestException, ValueError):
+                    logger.warning(
+                        "QR retrieval after instance creation failed."
+                    )
 
-            result["state"] = "created"
+            if not result.get("qrcode") and not result.get("pairingCode"):
+                result["state"] = "waiting_for_qr"
+                result["error"] = (
+                    "Instance was created, but no QR code was returned. "
+                    "Check the Evolution API instance state."
+                )
 
             return result
 
-        except requests.exceptions.RequestException as exc:
+        except requests.RequestException as exc:
+            logger.exception("Instance creation request failed.")
+            return cls._error_result("unreachable", str(exc))
 
-            logger.exception(
-                "Error creating Evolution API instance."
-            )
+    # ----------------------------------------------------------
+    # SEND WHATSAPP TEXT
+    # ----------------------------------------------------------
 
-            return {
-                "connected": False,
-                "state": "unreachable",
-                "qrcode": None,
-                "base64": None,
-                "pairingCode": None,
-                "error": str(exc),
-            }
-
-    # ==========================================================
-    # SEND TEXT MESSAGE
-    # ==========================================================
-
-    def send_text_message(
-        self,
-        number: str,
-        text: str,
-    ) -> dict:
-        """
-        Send a plain-text WhatsApp message.
-        """
-
+    def send_text_message(self, number, text):
         clean_number = "".join(
-            filter(
-                str.isdigit,
-                str(number),
-            )
+            character
+            for character in str(number)
+            if character.isdigit()
         )
 
         if not clean_number:
-
             return {
                 "success": False,
-                "error": (
-                    "Invalid WhatsApp phone number."
-                ),
+                "error": "Invalid WhatsApp phone number.",
             }
 
         if not text or not text.strip():
-
             return {
                 "success": False,
-                "error": (
-                    "Message text cannot be empty."
-                ),
+                "error": "Message text cannot be empty.",
             }
 
-        endpoint = (
-            f"{self.base_url}/message/"
-            f"sendText/{self.instance_name}"
+        endpoint = self._url(
+            f"message/sendText/{self.instance_name}"
         )
 
         payload = {
             "number": clean_number,
             "text": text.strip(),
-            "options": {
-                "delay": 1200,
-                "presence": "composing",
-            },
         }
 
         try:
-
             response = requests.post(
                 endpoint,
                 json=payload,
+                headers=self.headers,
+                timeout=30,
+            )
+
+            try:
+                data = response.json()
+            except ValueError:
+                data = {"raw_response": response.text[:500]}
+
+            if not response.ok:
+                logger.error(
+                    "Message send failed: HTTP %s",
+                    response.status_code,
+                )
+                return {
+                    "success": False,
+                    "error": f"Evolution API returned HTTP "
+                             f"{response.status_code}.",
+                    "data": data,
+                }
+
+            return {"success": True, "data": data}
+
+        except requests.RequestException as exc:
+            logger.exception("WhatsApp message request failed.")
+            return {"success": False, "error": str(exc)}
+
+    # ----------------------------------------------------------
+    # PHONE-NUMBER PAIRING CODE
+    # ----------------------------------------------------------
+
+    def get_pairing_code(self, phone_number):
+        phone = "".join(
+            character
+            for character in str(phone_number)
+            if character.isdigit()
+        )
+
+        if not 8 <= len(phone) <= 15:
+            return {
+                "success": False,
+                "error": "Enter a valid phone number with country code.",
+            }
+
+        try:
+            response = requests.get(
+                self._url(
+                    f"instance/connect/{self.instance_name}"
+                ),
+                params={"number": phone},
+                headers=self.headers,
+                timeout=30,
+            )
+
+            if not response.ok:
+                logger.warning(
+                    "Pairing-code request returned HTTP %s",
+                    response.status_code,
+                )
+                return {
+                    "success": False,
+                    "error": "Evolution API could not generate a pairing code.",
+                }
+
+            data = response.json()
+            if isinstance(data.get("data"), dict):
+                data = {**data, **data["data"]}
+
+            pairing_code = data.get("pairingCode")
+
+            if pairing_code:
+                return {
+                    "success": True,
+                    "pairingCode": pairing_code,
+                    "phone_number": phone,
+                }
+
+            return {
+                "success": False,
+                "error": "No pairing code was returned by Evolution API.",
+            }
+
+        except (requests.RequestException, ValueError) as exc:
+            logger.warning("Pairing-code request failed: %s", exc)
+            return {
+                "success": False,
+                "error": "Could not retrieve the pairing code.",
+            }
+
+    # ----------------------------------------------------------
+    # LOGOUT
+    # ----------------------------------------------------------
+
+    def logout(self):
+        endpoint = self._url(
+            f"instance/logout/{self.instance_name}"
+        )
+
+        try:
+            response = requests.delete(
+                endpoint,
                 headers=self.headers,
                 timeout=20,
             )
@@ -495,255 +503,18 @@ class EvolutionAPIService:
             try:
                 data = response.json()
             except ValueError:
-                data = {
-                    "raw_response": response.text
-                }
+                data = {"raw_response": response.text[:500]}
 
-            if response.status_code not in [
-                200,
-                201,
-            ]:
-
-                logger.error(
-                    "Evolution API message failed: "
-                    "HTTP %s - %s",
-                    response.status_code,
-                    response.text,
-                )
-
-                return {
-                    "success": False,
-                    "error": (
-                        f"Evolution API returned "
-                        f"HTTP {response.status_code}: "
-                        f"{response.text}"
-                    ),
-                    "data": data,
-                }
+            if response.ok:
+                return {"success": True, "data": data}
 
             return {
-                "success": True,
+                "success": False,
+                "error": f"Evolution API returned HTTP "
+                         f"{response.status_code}.",
                 "data": data,
             }
 
-        except requests.exceptions.RequestException as exc:
-
-            logger.exception(
-                "Failed to send WhatsApp message."
-            )
-
-            return {
-                "success": False,
-                "error": str(exc),
-            }
-
-    # ==========================================================
-    # LOGOUT / DISCONNECT
-    # ==========================================================
-
-    def logout(self) -> dict:
-        """
-        Logout the current Evolution API instance.
-        """
-
-        endpoint = (
-            f"{self.base_url}/instance/"
-            f"logout/{self.instance_name}"
-        )
-
-        try:
-
-            response = requests.delete(
-                endpoint,
-                headers=self.headers,
-                timeout=10,
-            )
-
-            try:
-                data = response.json()
-            except ValueError:
-                data = {
-                    "raw_response": response.text
-                }
-
-            if response.status_code in [
-                200,
-                201,
-            ]:
-
-                return {
-                    "success": True,
-                    "data": data,
-                }
-
-            return {
-                "success": False,
-                "error": (
-                    f"Evolution API returned "
-                    f"HTTP {response.status_code}"
-                ),
-                "data": data,
-            }
-
-        except requests.exceptions.RequestException as exc:
-
-            logger.exception(
-                "Failed to logout WhatsApp instance."
-            )
-
-            return {
-                "success": False,
-                "error": str(exc),
-            }
-
-
-
-def get_pairing_code(self, phone_number: str) -> dict:
- 
-    import logging
-    import requests
-
-    logger = logging.getLogger(__name__)
-
-    phone = "".join(
-        character for character in str(phone_number)
-        if character.isdigit()
-    )
-
-    if len(phone) < 8 or len(phone) > 15:
-        return {
-            "success": False,
-            "error": "Enter a valid phone number with country code.",
-        }
-
-    try:
-        # Ask Evolution API to generate a pairing code.
-        url = (
-            f"{self.base_url.rstrip('/')}/instance/connect/"
-            f"{self.instance_name}"
-        )
-
-        response = requests.get(
-            url,
-            params={"number": phone},
-            headers=getattr(self, "headers", {}),
-            timeout=30,
-        )
-
-        if not response.ok:
-            logger.error(
-                "Pairing-code request failed: HTTP %s",
-                response.status_code,
-            )
-            return {
-                "success": False,
-                "error": (
-                    "Evolution API could not generate a pairing code. "
-                    "Check the instance and API configuration."
-                ),
-            }
-
-        data = response.json()
-        pairing_code = data.get("pairingCode")
-
-        if not pairing_code and isinstance(data.get("data"), dict):
-            pairing_code = data["data"].get("pairingCode")
-
-        if pairing_code:
-            return {
-                "success": True,
-                "pairingCode": pairing_code,
-                "phone_number": phone,
-                "message": (
-                    "Open WhatsApp > Linked devices > "
-                    "Link with phone number and enter this code."
-                ),
-            }
-
-        return {
-            "success": False,
-            "error": (
-                "No pairing code was returned. Check that your "
-                "Evolution API version and WhatsApp connection "
-                "mode support phone-number pairing."
-            ),
-            "details": data,
-        }
-
-    except requests.RequestException:
-        logger.exception("Evolution API pairing request failed")
-        return {
-            "success": False,
-            "error": "Could not connect to Evolution API.",
-        }
-    except (ValueError, TypeError):
-        logger.exception("Invalid Evolution API response")
-        return {
-            "success": False,
-            "error": "Evolution API returned an invalid response.",
-        }
-        
-        
-
-
-
-
-
-
-
-@staticmethod
-def _format_qr_response(data: dict) -> dict:
-    """Normalize Evolution API QR responses."""
-
-    if not isinstance(data, dict):
-        return {
-            "connected": False,
-            "state": "invalid_response",
-            "qrcode": None,
-            "base64": None,
-            "pairingCode": None,
-            "error": "Evolution API returned an unexpected response.",
-        }
-
-    nested = data.get("data")
-    if isinstance(nested, dict):
-        data = {**data, **nested}
-
-    qr_object = data.get("qrcode")
-
-    if isinstance(qr_object, dict):
-        raw_base64 = (
-            qr_object.get("base64")
-            or data.get("base64")
-            or ""
-        )
-        pairing_code = (
-            qr_object.get("pairingCode")
-            or data.get("pairingCode")
-        )
-    else:
-        raw_base64 = data.get("base64") or (
-            qr_object if isinstance(qr_object, str) else ""
-        )
-        pairing_code = data.get("pairingCode")
-
-    if raw_base64 and raw_base64.startswith("data:image"):
-        image_data = raw_base64
-    elif raw_base64:
-        image_data = f"data:image/png;base64,{raw_base64}"
-    else:
-        image_data = None
-
-    return {
-        "connected": False,
-        "state": "qr" if image_data else "waiting_for_qr",
-        "qrcode": image_data,
-        "base64": image_data,
-        "code": data.get("code"),
-        "pairingCode": pairing_code,
-        "error": (
-            None if image_data or pairing_code
-            else "Evolution API returned no QR image. "
-                    "Check the instance state and API logs."
-        ),
-    }
+        except requests.RequestException as exc:
+            logger.exception("WhatsApp logout request failed.")
+            return {"success": False, "error": str(exc)}
