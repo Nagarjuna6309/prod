@@ -15,7 +15,7 @@ class ConnectionStatus(dict):
     def __bool__(self):
         return bool(self.get("connected", False))
 
-
+'''
 class EvolutionAPIService:
     """Client for the Evolution API WhatsApp instance."""
 
@@ -53,6 +53,35 @@ class EvolutionAPIService:
                 "Set EVOLUTION_API_INSTANCE or "
                 "EVOLUTION_INSTANCE_NAME."
             )
+
+        self.headers = {
+            "apikey": self.api_key,
+            "Content-Type": "application/json",
+        }
+        
+'''
+
+
+
+
+
+
+
+class EvolutionAPIService:
+
+    def __init__(self):
+        self.base_url = settings.EVOLUTION_API_URL
+        self.api_key = settings.EVOLUTION_API_KEY
+        self.instance_name = settings.EVOLUTION_API_INSTANCE
+
+        if not self.base_url:
+            raise ValueError("EVOLUTION_API_URL is not configured")
+
+        if not self.api_key:
+            raise ValueError("EVOLUTION_API_KEY is not configured")
+
+        if not self.instance_name:
+            raise ValueError("EVOLUTION_API_INSTANCE is not configured")
 
         self.headers = {
             "apikey": self.api_key,
