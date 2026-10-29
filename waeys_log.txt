@@ -1,0 +1,54 @@
+Starting WAeys connection...
+Waiting for QR and connection events.
+Press Ctrl+C to stop the test.
+
+{"class": "baileys", "count": 0, "level": "debug", "msg": "loaded tctoken index", "time": "2026-10-29T14:13:34.130051+00:00"}
+
+=======================================================
+WHATSAPP CONNECTION UPDATE
+=======================================================
+{
+  "connection": "connecting",
+  "receivedPendingNotifications": false,
+  "qr": null
+}
+
+Possible error details:
+{"class": "baileys", "browser": ["Windows", "Chrome", "10.0.22631"], "helloMsg": "<WAeys.WAProto.WAProto.HandshakeMessage object at 0x0000016259494AD0>", "level": "info", "msg": "connected to WA", "time": "2026-10-29T14:13:34.704123+00:00"}
+{"class": "baileys", "handshake": "<WAeys.WAProto.WAProto.HandshakeMessage object at 0x000001625934E990>", "level": "trace", "msg": "handshake recv from WA", "time": "2026-10-29T14:13:34.956129+00:00"}
+{"class": "baileys", "node": "<WAeys.WAProto.WAProto.ClientPayload object at 0x0000016259496BA0>", "level": "info", "msg": "not logged in, attempting registration...", "time": "2026-10-29T14:13:35.804899+00:00"}
+{"class": "ns", "obj": "Noise handler transitioned to Transport state", "level": "trace", "time": "2026-10-29T14:13:35.839355+00:00"}
+
+=======================================================
+WHATSAPP CONNECTION UPDATE
+=======================================================
+{
+  "qr": "https://wa.me/settings/linked_devices#2@eHVTrRkNkvGJFJlJ//h7ffeC9gpCsA94UYPUb7ZfGhtPmKMizkGE/b1hZmshMbH2ZdGuPA/luGGQ8o1UcYwUbrsPl7mVWAZXG+8=,uWhtuw5MSMoc9vCiM7HxoTqyN5HNoy93pDSJMm58w3U=,a3xg8clShMbZg73EOnCnODCrS8S0py4TdWsHZSVrEls=,x8SXNeCyFF3hy6WbRuqVth/qRbUq0fAkbOF4yHOBtto=,1"
+}
+
+Possible error details:
+
+QR saved as whatsapp_qr.png
+Scan it using WhatsApp > Linked devices > Link a device.
+{"class": "baileys", "trace": null, "level": "info", "msg": "connection errored", "time": "2026-10-29T14:14:05.888435+00:00"}
+{"class": "baileys", "obj": "Event buffer destroyed", "level": "debug", "time": "2026-10-29T14:14:06.381610+00:00"}
+
+=======================================================
+WHATSAPP CONNECTION UPDATE
+=======================================================
+{
+  "connection": "close",
+  "lastDisconnect": {
+    "error": "Connection was lost",
+    "date": 1793283246.3807557
+  }
+}
+
+Possible error details:
+  event.lastDisconnect = {'error': Boom('Connection was lost'), 'date': 1793283246.3807557}
+  event.lastDisconnect.error = Boom('Connection was lost')
+  event.lastDisconnect.error exception type = Boom
+  event.lastDisconnect.error exception message = Connection was lost
+
+ERROR: WhatsApp connection closed.
+Full close event: {'connection': 'close', 'lastDisconnect': {'error': Boom('Connection was lost'), 'date': 1793283246.3807557}}

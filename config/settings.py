@@ -230,27 +230,16 @@ MEDIA_ROOT = BASE_DIR / "media"
 # ============================================================
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
-EMAIL_HOST = os.environ.get(
-    "EMAIL_HOST",
-    "smtp.gmail.com",
-)
+EMAIL_HOST_USER = "noti5me.info@gmail.com"
+#EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_HOST_PASSWORD="umktcxwurjycsjay"
 
-EMAIL_PORT = int(
-    os.environ.get("EMAIL_PORT", "587")
-)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-EMAIL_USE_TLS = (
-    os.environ.get("EMAIL_USE_TLS", "True").lower() == "true"
-)
-
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
-
-DEFAULT_FROM_EMAIL = os.environ.get(
-    "DEFAULT_FROM_EMAIL",
-    EMAIL_HOST_USER,
-)
 
 EMAIL_TIMEOUT = 10
 

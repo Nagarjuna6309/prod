@@ -207,7 +207,7 @@ OTP_RESEND_WAIT_SECONDS = 30
 
 
 def _send_registration_otp(request, pending):
-    """Generate and email a registration OTP."""
+    """Send an email OTP before creating the user account."""
     code = f"{secrets.randbelow(900000) + 100000}"
 
     try:
@@ -223,15 +223,14 @@ def _send_registration_otp(request, pending):
             recipient_list=[pending["email"]],
             fail_silently=False,
         )
-    
     except Exception:
         import logging
         logging.getLogger(__name__).exception(
-            "Failed to send registration OTP email"
+            "Registration OTP email delivery failed"
         )
         return False
 
-
+    # Save registration data in the session ONLY after email succeeds.
     pending["otp_hash"] = make_password(code)
     pending["otp_expires_at"] = int(time.time()) + OTP_EXPIRY_SECONDS
     pending["otp_attempts"] = 0
@@ -240,6 +239,7 @@ def _send_registration_otp(request, pending):
     request.session[REGISTRATION_OTP_KEY] = pending
     request.session.modified = True
     return True
+
 
 
 def register_page(request):
@@ -374,7 +374,7 @@ def register_page(request):
 
     return render(request, "accounts/register.html")
 
-
+"""
 def otp(request):
     pending = request.session.get(REGISTRATION_OTP_KEY)
 
@@ -467,9 +467,164 @@ def otp(request):
     return render(request, "accounts/otp.html", {
         "email": pending["email"],
     })
-
+"""
         
-    
+
+
+
+
+
+def otp(request):
+    pending = request.session.get(REGISTRATION_OTP_KEY)
+
+    # Registration must be completed before OTP verification.
+    if not pending:
+        messages.error(
+            request,
+            "Please register first to receive an OTP."
+        )
+        return redirect("register")
+
+    if request.method == "POST":
+        action = request.POST.get("action", "verify")
+
+        # Resend OTP
+        if action == "resend":
+            now = int(time.time())
+            last_sent = pending.get("last_sent_at", 0)
+
+            if now - last_sent < OTP_RESEND_WAIT_SECONDS:
+                messages.error(
+                    request,
+                    "Please wait 30 seconds before requesting another OTP."
+                )
+                return render(
+                    request,
+                    "accounts/otp.html",
+                    {"email": pending["email"]}
+                )
+
+            if not _send_registration_otp(request, pending):
+                messages.error(
+                    request,
+                    "Unable to send the OTP. Please check your email settings."
+                )
+            else:
+                messages.success(
+                    request,
+                    "A new verification code has been sent to your email."
+                )
+
+            return render(
+                request,
+                "accounts/otp.html",
+                {"email": pending["email"]}
+            )
+
+        # Verify OTP
+        received_otp = request.POST.get("otp", "").strip()
+
+        # Check expiry
+        if int(time.time()) > pending.get("otp_expires_at", 0):
+            messages.error(
+                request,
+                "OTP expired. Please request a new code."
+            )
+            return render(
+                request,
+                "accounts/otp.html",
+                {"email": pending["email"]}
+            )
+
+        # Limit incorrect attempts
+        attempts = pending.get("otp_attempts", 0)
+
+        if attempts >= OTP_MAX_ATTEMPTS:
+            messages.error(
+                request,
+                "Too many incorrect attempts. Please request a new OTP."
+            )
+            return render(
+                request,
+                "accounts/otp.html",
+                {"email": pending["email"]}
+            )
+
+        # Validate OTP
+        if (
+            len(received_otp) != 6
+            or not received_otp.isdigit()
+            or not check_password(
+                received_otp,
+                pending.get("otp_hash", "")
+            )
+        ):
+            pending["otp_attempts"] = attempts + 1
+            request.session[REGISTRATION_OTP_KEY] = pending
+            request.session.modified = True
+
+            messages.error(
+                request,
+                "Invalid OTP. Please check your email and try again."
+            )
+            return render(
+                request,
+                "accounts/otp.html",
+                {"email": pending["email"]}
+            )
+
+        # OTP is correct. Check for existing accounts again.
+        if (
+            User.objects.filter(mobile=pending["mobile"]).exists()
+            or User.objects.filter(
+                mail__iexact=pending["email"]
+            ).exists()
+        ):
+            request.session.pop(REGISTRATION_OTP_KEY, None)
+            messages.error(
+                request,
+                "This mobile number or email is already registered."
+            )
+            return redirect("register")
+
+        # IMPORTANT: Create the account ONLY after OTP verification.
+        try:
+            user = User(
+                mobile=pending["mobile"],
+                user_fullname=pending["user_fullname"],
+                mail=pending["email"],
+                is_active=True,
+            )
+
+            # Password was hashed when registration was submitted.
+            user.password = pending["password_hash"]
+            user.save()
+
+        except IntegrityError:
+            request.session.pop(REGISTRATION_OTP_KEY, None)
+            messages.error(
+                request,
+                "This mobile number or email may already be registered."
+            )
+            return redirect("register")
+
+        # Clear registration data only after successful creation.
+        request.session.pop(REGISTRATION_OTP_KEY, None)
+        request.session.modified = True
+
+        messages.success(
+            request,
+            "Email verified and account created successfully. You can now log in."
+        )
+        return redirect("login")
+
+    # Display OTP page
+    return render(
+        request,
+        "accounts/otp.html",
+        {"email": pending["email"]}
+    )
+  
     
     
  

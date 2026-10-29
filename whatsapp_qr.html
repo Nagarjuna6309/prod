@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noti5me - QR Connection Test</title>
+    <style>
+        body {
+            background: #111;
+            color: #eee;
+            font-family: Arial, sans-serif;
+            padding: 24px;
+        }
+        .panel {
+            max-width: 750px;
+            margin: auto;
+            padding: 22px;
+            background: #1d1d1d;
+            border-radius: 12px;
+        }
+        h2 { color: #ff9800; }
+        .status { color: #00d084; }
+        pre {
+            background: #080808;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+        button {
+            padding: 10px 16px;
+            background: #ff9800;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="panel">
+    <h2>Noti5me — WhatsApp QR Test</h2>
+    <p>Status: <span class="status" id="status">Waiting for test...</span></p>
+    <p>HTTP error code: <span id="code">Not received</span></p>
+    <p>Last checked: <span id="time">—</span></p>
+    <h3>Error details</h3>
+    <pre id="details">No errors received yet.</pre>
+    <button onclick="location.reload()">Refresh test</button>
+</div>
+
+<script>
+    const params = new URLSearchParams(location.search);
+    const error = params.get("error");
+    const code = params.get("code");
+    const status = params.get("status");
+
+    document.getElementById("status").textContent =
+        status || (error ? "Failed" : "Page loaded; QR status not checked");
+
+    document.getElementById("code").textContent = code || "Not received";
+    document.getElementById("details").textContent =
+        error ? error : "No error supplied by the backend.";
+
+    document.getElementById("time").textContent =
+        new Date().toLocaleString();
+</script>
+</body>
+</html>
