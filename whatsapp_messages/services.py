@@ -100,6 +100,11 @@ class EvolutionAPIService:
             "Content-Type": "application/json",
         }
 
+    def _url(self, endpoint):
+        """Build a complete Evolution API endpoint URL."""
+        endpoint = endpoint.lstrip("/")
+        return f"{self.base_url.rstrip('/')}/{endpoint}"
+
 
     @staticmethod
     def _error_result(state, message):
