@@ -40,15 +40,34 @@ from django.conf import settings
     print(f'[SMS Delivery Error] {exc}')
     print(f'[DEV BACKUP] OTP for {target} is: {otp_code}')
     return False, str(exc)'''
+
+
+
+
+
+import logging
+
 from django.conf import settings
 from django.core.mail import send_mail
 
+logger = logging.getLogger(__name__)
+
 
 def send_otp_via_email(user_email, otp_code):
+    """
+    Send a password-reset OTP to the user's email.
+    Returns (success, message).
+    """
+
     if not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
+        logger.error("Email SMTP credentials are not configured.")
         return False, "Email SMTP credentials are not configured."
 
+    if not user_email:
+        return False, "Recipient email address is missing."
+
     subject = "Noti5me - Password Reset Verification Code"
+
     message = (
         "Hello,\n\n"
         "You requested a password reset for your Noti5me account.\n\n"
@@ -70,9 +89,10 @@ def send_otp_via_email(user_email, otp_code):
         if sent_count == 1:
             return True, "Email sent successfully."
 
-        return False, "The email backend did not confirm delivery."
+        logger.warning("Email backend did not confirm sending the OTP email.")
+        return False, "The email backend did not confirm sending."
 
-    except Exception as exc:
-        # Log the error, but never log the OTP itself.
-        print(f"[EMAIL ERROR] Could not send password-reset email: {exc}")
-        return False, "Email sending failed."
+    except Exception:
+        # Log technical details, but never log the OTP or email message.
+        logger.exception("Could not send password-reset OTP email.")
+        return False, "Email sending failed. Please try again later."
