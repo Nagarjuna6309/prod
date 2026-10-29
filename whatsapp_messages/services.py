@@ -69,27 +69,37 @@ class EvolutionAPIService:
 
 class EvolutionAPIService:
 
-    def __init__(self):
-        self.base_url = settings.EVOLUTION_API_URL
-        self.api_key = settings.EVOLUTION_API_KEY
-        self.instance_name = settings.EVOLUTION_API_INSTANCE
+        
+    def __init__(self, instance_name=None, instance=None):
+        from django.conf import settings
+
+        self.base_url = getattr(settings, "EVOLUTION_API_URL", None)
+        self.api_key = getattr(settings, "EVOLUTION_API_KEY", None)
+
+        configured_instance = (
+            getattr(settings, "EVOLUTION_API_INSTANCE", None)
+            or getattr(settings, "EVOLUTION_INSTANCE_NAME", None)
+        )
+
+        self.instance_name = instance_name or instance or configured_instance
+        # Keep the old attribute name for compatibility with existing methods.
+        self.instance = self.instance_name
 
         if not self.base_url:
-            raise ValueError("EVOLUTION_API_URL is not configured")
+            raise ValueError("EVOLUTION_API_URL is not configured.")
 
         if not self.api_key:
-            raise ValueError("EVOLUTION_API_KEY is not configured")
+            raise ValueError("EVOLUTION_API_KEY is not configured.")
 
         if not self.instance_name:
-            raise ValueError("EVOLUTION_API_INSTANCE is not configured")
+            raise ValueError("EVOLUTION_API_INSTANCE is not configured.")
 
+        self.base_url = self.base_url.rstrip("/")
         self.headers = {
             "apikey": self.api_key,
             "Content-Type": "application/json",
         }
 
-    def _url(self, path):
-        return f"{self.base_url}/{path.lstrip('/')}"
 
     @staticmethod
     def _error_result(state, message):
