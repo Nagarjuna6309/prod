@@ -1,57 +1,87 @@
+
+import logging
+
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from django.utils import timezone
-from django.conf import settings
-import requests
+
 from whatsapp_messages.models import ScheduledWhatsAppMessage
+from whatsapp_messages.tasks import send_scheduled_whatsapp_message
+
+logger = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
-    help = 'Sends pending scheduled WhatsApp messages'
+    help = "Process and send due scheduled WhatsApp messages."
 
     def handle(self, *args, **options):
-        current_date = timezone.now()
-        self.stdout.write(f"Checking messages for: {current_date.strftime('%Y-%m-%d %H:%M:%S')}")
+        now = timezone.now()
+        processed = 0
 
-        # Fetch messages that are pending and whose scheduled time has arrived/passed
-        pending_messages = ScheduledWhatsAppMessage.objects.filter(
-            status="pending",
-            scheduled_date__lte=current_date,
-        )
+        self.stdout.write(f"Checking scheduled messages at {now}...")
 
-        count = pending_messages.count()
-        self.stdout.write(f"Found {count} pending message(s) to send.")
+        while True:
+            # Claim one due message atomically to reduce duplicate processing.
+            with transaction.atomic():
+                message = (
+                    ScheduledWhatsAppMessage.objects
+                    .select_for_update(skip_locked=True)
+                    .filter(
+                        status="Scheduled",
+                        scheduled_at__isnull=False,
+                        scheduled_at__lte=now,
+                    )
+                    .order_by("scheduled_at")
+                    .first()
+                )
 
-        for msg in pending_messages:
+                if message is None:
+                    break
+
+                updated = (
+                    ScheduledWhatsAppMessage.objects
+                    .filter(id=message.id, status="Scheduled")
+                    .update(
+                        status="Processing",
+                        error_log=None,
+                        updated_at=timezone.now(),
+                    )
+                )
+
+                if not updated:
+                    continue
+
+                message_id = message.id
+
+            # Run the existing Celery task locally; no broker is needed
+            # for this synchronous invocation.
             try:
-                # Example Evolution API integration (adjust if your endpoint differs)
-                api_url = f"{settings.EVOLUTION_API_URL}/message/sendText/{settings.EVOLUTION_INSTANCE_NAME}"
-                headers = {
-                    "apikey": settings.EVOLUTION_API_KEY,
-                    "Content-Type": "application/json"
-                }
-                payload = {
-                    "number": msg.recipient_mobile,
-                    "text": msg.message
-                }
+                result = send_scheduled_whatsapp_message.apply(
+                    args=(message_id,),
+                    throw=False,
+                )
 
-                response = requests.post(api_url, json=payload, headers=headers, timeout=30)
-
-                if response.status_code in [200, 201]:
-                    res_data = response.json()
-                    msg.status = "sent"
-                    msg.sent_at = timezone.now()
-                    msg.twilio_sid = res_data.get("key", {}).get("id") or res_data.get("messageId")
-                    msg.save()
-                    self.stdout.write(self.style.SUCCESS(f"Successfully sent message ID {msg.id} to {msg.recipient_mobile}"))
+                if result.failed():
+                    self.stderr.write(
+                        self.style.ERROR(
+                            f"Message {message_id} encountered an error."
+                        )
+                    )
                 else:
-                    msg.status = "failed"
-                    msg.error_log = response.text
-                    msg.save()
-                    self.stdout.write(self.style.ERROR(f"Failed to send message ID {msg.id}: {response.text}"))
+                    self.stdout.write(
+                        f"Processed message {message_id}."
+                    )
 
-            except Exception as e:
-                msg.status = "failed"
-                msg.error_log = str(e)
-                msg.save()
-                self.stdout.write(self.style.ERROR(f"Exception occurred for message ID {msg.id}: {str(e)}"))
+                processed += 1
 
-        self.stdout.write(self.style.SUCCESS('Finished processing scheduled WhatsApp messages.'))
+            except Exception:
+                logger.exception(
+                    "Failed processing scheduled message %s",
+                    message_id,
+                )
+
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Finished. Processed {processed} message(s)."
+            )
+        )
