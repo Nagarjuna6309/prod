@@ -189,7 +189,7 @@ class EvolutionAPIService:
     def check_connection(cls, instance_name=None):
         try:
             service = cls(instance_name=instance_name)
-        except ImproperlyConfigured as exc:
+        except (ImproperlyConfigured, ValueError) as exc:
             logger.error("Evolution API configuration error: %s", exc)
             return ConnectionStatus({
                 "connected": False,
@@ -259,7 +259,7 @@ class EvolutionAPIService:
     def get_or_create_qr(cls, instance_name=None):
         try:
             service = cls(instance_name=instance_name)
-        except ImproperlyConfigured as exc:
+        except (ImproperlyConfigured, ValueError) as exc:
             return cls._error_result("configuration_error", str(exc))
 
         status = cls.check_connection(
