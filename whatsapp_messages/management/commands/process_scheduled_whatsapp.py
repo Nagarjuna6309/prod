@@ -1,5 +1,6 @@
 
 import logging
+import time
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -12,15 +13,36 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Process due scheduled WhatsApp messages without a Celery worker."
+    help = "Check and process scheduled WhatsApp messages every 30 seconds."
 
     def handle(self, *args, **options):
-        now = timezone.now()
+        interval = 30
+
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"WhatsApp scheduler started. Checking every {interval} seconds."
+            )
+        )
+
+        try:
+            while True:
+                self.process_due_messages()
+                self.stdout.write(
+                    f"Next check in {interval} seconds..."
+                )
+                time.sleep(interval)
+
+        except KeyboardInterrupt:
+            self.stdout.write(
+                self.style.WARNING("WhatsApp scheduler stopped.")
+            )
+
+    def process_due_messages(self):
         processed = 0
 
-        self.stdout.write(f"Checking scheduled messages at {now}...")
-
         while True:
+            now = timezone.now()
+
             with transaction.atomic():
                 queryset = ScheduledWhatsAppMessage.objects.filter(
                     status="Scheduled",
@@ -28,10 +50,7 @@ class Command(BaseCommand):
                     scheduled_at__lte=now,
                 ).order_by("scheduled_at")
 
-                # Claim one message at a time to prevent duplicate processing.
-                if (
-                    transaction.get_connection().vendor == "postgresql"
-                ):
+                if transaction.get_connection().vendor == "postgresql":
                     queryset = queryset.select_for_update(skip_locked=True)
 
                 message = queryset.first()
@@ -45,6 +64,7 @@ class Command(BaseCommand):
                     .update(
                         status="Processing",
                         error_log=None,
+                        updated_at=timezone.now(),
                     )
                 )
 
@@ -65,13 +85,13 @@ class Command(BaseCommand):
                     self.stderr.write(
                         self.style.ERROR(
                             f"Message {message_id} failed. Check error_log "
-                            "and Render logs."
+                            "and application logs."
                         )
                     )
                 else:
                     self.stdout.write(
                         self.style.SUCCESS(
-                            f"Message {message_id} processed."
+                            f"Message {message_id} task completed."
                         )
                     )
 
@@ -88,8 +108,7 @@ class Command(BaseCommand):
                     )
                 )
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Finished. Processed {processed} message(s)."
-            )
-        )
+        if processed == 0:
+            self.stdout.write("No due messages found.")
+        else:
+            self.stdout.write(f"Processed {processed} message(s).")
