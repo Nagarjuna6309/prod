@@ -272,7 +272,7 @@ DEFAULT_FROM_EMAIL = os.environ.get(
 # ============================================================
 # CELERY
 # ============================================================
-
+'''
 CELERY_BROKER_URL = os.environ.get(
     "CELERY_BROKER_URL",
     os.environ.get(
@@ -286,17 +286,18 @@ CELERY_RESULT_BACKEND = os.environ.get(
     CELERY_BROKER_URL,
 )
 
-CELERY_ACCEPT_CONTENT = [
-    "json",
-]
+'''
 
+import os
+
+CELERY_BROKER_URL = os.environ.get("REDIS_URL")
+CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL")
+
+CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
-
 CELERY_RESULT_SERIALIZER = "json"
-
-CELERY_TIMEZONE = TIME_ZONE
-
-
+CELERY_TIMEZONE = "Asia/Kolkata"
+CELERY_ENABLE_UTC = True
 
 
 # ============================================================
